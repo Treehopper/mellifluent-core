@@ -10,7 +10,7 @@
 
     <properties>
         <junit5.version>5.7.0</junit5.version>
-        <junit5.platform.version>1.7.0</junit5.platform.version>
+        <junit5.platform.version>1.7.1</junit5.platform.version>
         <java.version>11</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
