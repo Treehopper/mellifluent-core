@@ -19,34 +19,25 @@
  */
 package eu.hohenegger.mellifluent.generator;
 
-import static java.util.stream.Collectors.toList;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
-import static spoon.reflect.declaration.ModifierKind.PUBLIC;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-
-import spoon.reflect.declaration.CtMethod;
-import spoon.reflect.declaration.CtType;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DisplayName("Generated Spoon Model Test")
-public class GeneratedSpoonModelTest extends AbstractGeneratedSpoonModelTest {
+public class GeneratedUnassistedSpoonModelTest extends AbstractGeneratedSpoonModelTest {
 
     @BeforeAll
     public void setUp() {
-        String srcPackageFolderName = "eu/hohenegger/mellifluent/generator/model";
-        Path srcPath = Paths.get("src/main/java");
+        String srcPackageFolderName = "eu/hohenegger/mellifluent/generator/model/generics";
+        Path srcPath = Paths.get("src/test/java");
 
-        generator = new FluentBuilderGenerator<>();
+        generator = new UnassistedFluentBuilderGenerator<>();
 
         Path folder = srcPath.resolve(srcPackageFolderName);
         generator.setup(folder, GeneratedSourceCompilationTest.class.getClassLoader(), null, null);
@@ -57,20 +48,6 @@ public class GeneratedSpoonModelTest extends AbstractGeneratedSpoonModelTest {
         } catch (GeneratorException e) {
             fail(e);
         }
-    }
-
-    @DisplayName("Verify Get Methods for")
-    @MethodSource("ctTypes")
-    @ParameterizedTest(name = "{displayName}: {arguments}")
-    public void testGetMethods(CtType<Object> ctType) throws Throwable {
-
-        List<CtMethod<?>> getMethods = ctType.getMethods().stream()
-                .filter(method -> method.getSimpleName().startsWith("get")).collect(toList());
-        assertThat(getMethods).isNotEmpty();
-        assertThat(getMethods).allSatisfy(method -> {
-            assertThat(method.getAnnotation(Override.class)).isNotNull();
-            assertThat(method.getVisibility()).isEqualTo(PUBLIC);
-        });
     }
 
 }
