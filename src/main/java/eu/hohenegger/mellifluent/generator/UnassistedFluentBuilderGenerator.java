@@ -65,7 +65,7 @@ import spoon.reflect.visitor.Filter;
 import spoon.support.reflect.code.CtLocalVariableImpl;
 import spoon.support.reflect.declaration.CtMethodImpl;
 
-@Named("FluentBuilderGenerator")
+@Named("UnassistedFluentBuilderGenerator")
 public class UnassistedFluentBuilderGenerator<T extends Class> extends AbstractFluentGenerator<T> {
 
     private CtPackage builderPackage;
