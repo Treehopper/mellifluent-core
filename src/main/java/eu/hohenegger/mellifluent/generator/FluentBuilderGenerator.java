@@ -133,33 +133,7 @@ public class FluentBuilderGenerator<T extends Class> extends AbstractFluentGener
 
     @Override
     protected Filter<CtType<?>> createFilter(String packageName) {
-        Filter<CtType<?>> filter = element -> {
-            if (element == null) {
-                return false; //FIXME: why would this happen?
-            }
-            CtPackage pack = element.getPackage();
-            if (pack == null) {
-                return false; //FIXME: why would this happen?
-            }
-            String fqn = pack.getQualifiedName();
-            boolean isInPackage = fqn.startsWith(packageName);
-            if (!isInPackage) {
-                return false;
-            }
-            if (!element.isInterface()) {
-                return false;
-            }
-            if (element.getMethods().size() < 2) {
-                return false;
-            }
-            Set<CtMethod<?>> defaultMethods = Util.findDefaultMethods(element);
-            if (defaultMethods.size() != 1) {
-                return false;
-            }
-
-            return true;
-        };
-        return filter;
+        return new FilterForInterfacesWithTwoADefaultMethod<T>(packageName);
     }
 
     @Override

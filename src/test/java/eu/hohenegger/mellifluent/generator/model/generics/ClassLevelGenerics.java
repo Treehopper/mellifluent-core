@@ -2,7 +2,7 @@
  * #%L
  * mellifluent-core
  * %%
- * Copyright (C) 2020 - 2021 Max Hohenegger <mellifluent@hohenegger.eu>
+ * Copyright (C) 2021 Max Hohenegger <mellifluent@hohenegger.eu>
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,15 @@
  * limitations under the License.
  * #L%
  */
-package eu.hohenegger.mellifluent.generator.api;
+package eu.hohenegger.mellifluent.generator.model.generics;
 
+import java.util.Set;
 
-public abstract class AbstractFluentBuilder {
-    protected abstract AbstractFluentBuilder self();
+import spoon.reflect.declaration.CtClass;
+
+public class ClassLevelGenerics<T> {
+
+    public <C extends CtClass<T>> C setConstructors(Set<T> constructors) {
+        return (C) this;
+    }
 }
-

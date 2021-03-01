@@ -44,18 +44,17 @@ import com.google.testing.compile.JavaFileObjects;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DisplayName("Generated Source Compilation Test")
-public class GeneratedSourceCompilationTest extends AbstractSourceCompilationTest {
+public class GeneratedUnassistedSourceCompilationTest extends AbstractSourceCompilationTest {
 
     @BeforeAll
     protected void setUpAll() {
-        generator = new FluentBuilderGenerator<>();
-
-        String SRC_PACKAGE_FOLDER_NAME = "eu/hohenegger/mellifluent/generator/model";
+        String SRC_PACKAGE_FOLDER_NAME = "eu/hohenegger/mellifluent/generator/model/generics";
+        folder = Paths.get("src/test/java")
+                .resolve(SRC_PACKAGE_FOLDER_NAME);
         sourcePackageName = SRC_PACKAGE_FOLDER_NAME.replace('/', '.');
         targetPackageName = TARGET_PACKAGE_FOLDER_NAME.replace('/', '.');
 
-        Path folder = Paths.get("src/main/java")
-                .resolve(SRC_PACKAGE_FOLDER_NAME);
+        generator = new UnassistedFluentBuilderGenerator<>();
         generator.setup(folder, getClass().getClassLoader(), null, null);
     }
 
@@ -79,12 +78,10 @@ public class GeneratedSourceCompilationTest extends AbstractSourceCompilationTes
                 .withClasspath(getClassPathEntries())
                 .compile(sources);
         assertThat(compilation).succeeded();
-//        assertThat(compilation.diagnostics()).isNotEmpty();
         assertThat(compilation.diagnostics()).allSatisfy(note -> {
             assertThat(note.getKind()).isEqualTo(NOTE);
         });
 
         assertTrue(Files.isDirectory(subDir.toPath()));
     }
-
 }
