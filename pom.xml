@@ -38,7 +38,7 @@
         <dependency>
             <groupId>fr.inria.gforge.spoon</groupId>
             <artifactId>spoon-core</artifactId>
-            <version>${spoon.version}</version>
+            <version>8.2.0</version>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
@@ -167,7 +167,7 @@
                     <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
                     <licenseName>apache_v2</licenseName>
                     <organizationName>hohenegger.eu</organizationName>
-                    <copyrightOwners>Max Hohenegger &lt;mellifluent@hohenegger.eu&gt;</copyrightOwners>
+                    <copyrightOwners>Max Hohenegger &lt;mellifluent@hohenegger.eu></copyrightOwners>
                     <inceptionYear>2021</inceptionYear>
                 </configuration>
                 <executions>
