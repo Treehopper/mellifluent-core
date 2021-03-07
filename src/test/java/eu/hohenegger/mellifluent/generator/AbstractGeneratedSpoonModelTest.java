@@ -58,14 +58,14 @@ public abstract class AbstractGeneratedSpoonModelTest {
         assertThat(withMethods).isNotEmpty();
         assertThat(withMethods).allSatisfy(method -> {
             assertThat(method.getVisibility()).isEqualTo(PUBLIC);
-            assertThat(method.getType()).isEqualTo(ctType.getReference());
+            assertThat(method.getType().getSimpleName()).isEqualTo(ctType.getReference().getSimpleName());
         });
 
         List<CtMethod<?>> selfMethods = ctType.getMethodsByName("self");
         assertThat(selfMethods).hasSize(1);
         assertThat(selfMethods).allSatisfy(method -> {
             assertThat(method.getAnnotation(Override.class)).isNotNull();
-            assertThat(method.getType()).isEqualTo(ctType.getReference());
+            assertThat(method.getType().getSimpleName()).isEqualTo(ctType.getReference().getSimpleName());
         });
 
         List<CtMethod<?>> buildMethods = ctType.getMethodsByName("build");

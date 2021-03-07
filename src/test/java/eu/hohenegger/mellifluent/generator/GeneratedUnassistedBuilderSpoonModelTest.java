@@ -81,7 +81,7 @@ public class GeneratedUnassistedBuilderSpoonModelTest {
         assertThat(withMethods).isNotEmpty();
         assertThat(withMethods).allSatisfy(method -> {
             assertThat(method.getVisibility()).isEqualTo(PUBLIC);
-            assertThat(method.getType()).isEqualTo(ctType.getReference());
+            assertThat(method.getType().getSimpleName()).isEqualTo(ctType.getReference().getSimpleName());
             assertThat(method.getBody().getStatements()).isNotEmpty();
         });
 
@@ -89,7 +89,7 @@ public class GeneratedUnassistedBuilderSpoonModelTest {
         assertThat(selfMethods).hasSize(1);
         assertThat(selfMethods).allSatisfy(method -> {
             assertThat(method.getAnnotation(Override.class)).isNotNull();
-            assertThat(method.getType()).isEqualTo(ctType.getReference());
+            assertThat(method.getType().getSimpleName()).isEqualTo(ctType.getReference().getSimpleName());
             assertThat(method.getBody().getStatements()).isNotEmpty();
             assertTrue(method.getBody().getLastStatement() instanceof CtReturn);
         });
