@@ -33,7 +33,7 @@ public interface IBuilderBuilder {
         builderClass.addMethod(getBuildMethod());
         builderClass.addModifier(ModifierKind.PUBLIC);
         builderClass.putMetadata(GENERATED_BY, getGeneratedByMetaData());
-        return builderClass.clone(); /* TODO: why clone */
+        return builderClass;
     }
 
     CtType<Object> getBuilderClass();

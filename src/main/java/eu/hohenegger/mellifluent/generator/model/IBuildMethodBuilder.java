@@ -27,7 +27,7 @@ import spoon.reflect.declaration.CtType;
 public interface IBuildMethodBuilder {
 
     default CtMethod<?> build() {
-        CtMethod<?> buildMethod = Util.findDefaultMethods(getBuildable()).iterator().next().clone();
+        CtMethod<?> buildMethod = Util.findDefaultMethods(getBuildable()).iterator().next();
         buildMethod.setDefaultMethod(false);
         buildMethod.addModifier(PUBLIC);
         buildMethod.setSimpleName("build");

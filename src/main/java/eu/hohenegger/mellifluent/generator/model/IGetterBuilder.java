@@ -40,7 +40,7 @@ public interface IGetterBuilder {
     CtMethod<?> getInterfaceMethod();
 
     default CtMethod<?> build() {
-        CtMethod<?> result = getInterfaceMethod().clone();
+        CtMethod<?> result = getInterfaceMethod();
         result.removeModifier(ModifierKind.ABSTRACT);
         CtTypeReference<Annotation> overrideReference = getTypeFactory().createCtTypeReference(Override.class);
         result.addAnnotation(getTypeFactory().createAnnotation(overrideReference));

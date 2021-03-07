@@ -170,7 +170,7 @@ public class UnassistedFluentBuilderGenerator<T extends Class> extends AbstractF
         build.setParent(builderPackage);
         builderPackage.addType(build);
 
-        builderPackage.addType(abstractBuilder.clone());
+        builderPackage.addType(abstractBuilder);
 
         return builderClass;
     }
@@ -253,6 +253,6 @@ public class UnassistedFluentBuilderGenerator<T extends Class> extends AbstractF
 
     @Override
     CtPackage getGeneratedPackage() {
-        return model.getRootPackage().clone();
+        return model.getRootPackage();
     }
 }

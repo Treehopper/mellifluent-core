@@ -126,7 +126,7 @@ public class FluentBuilderGenerator<T extends Class> extends AbstractFluentGener
         build.setParent(builderPackage);
         builderPackage.addType(build);
 
-        builderPackage.addType(abstractBuilder.clone());
+        builderPackage.addType(abstractBuilder);
 
         return builderClass;
     }
@@ -138,6 +138,6 @@ public class FluentBuilderGenerator<T extends Class> extends AbstractFluentGener
 
     @Override
     CtPackage getGeneratedPackage() {
-        return model.getRootPackage().clone();
+        return model.getRootPackage();
     }
 }
