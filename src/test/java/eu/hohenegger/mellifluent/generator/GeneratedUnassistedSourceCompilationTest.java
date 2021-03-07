@@ -19,31 +19,14 @@
  */
 package eu.hohenegger.mellifluent.generator;
 
-import static com.google.testing.compile.CompilationSubject.assertThat;
-import static com.google.testing.compile.Compiler.javac;
-import static java.util.stream.Collectors.toList;
-import static javax.tools.Diagnostic.Kind.NOTE;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-
-import javax.tools.JavaFileObject;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
-import com.google.testing.compile.Compilation;
-import com.google.testing.compile.JavaFileObjects;
-
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@DisplayName("Generated Source Compilation Test")
+@DisplayName("Generated Fluent Source Compilation Test")
 public class GeneratedUnassistedSourceCompilationTest extends AbstractSourceCompilationTest {
 
     @BeforeAll
@@ -58,30 +41,4 @@ public class GeneratedUnassistedSourceCompilationTest extends AbstractSourceComp
         generator.setup(folder, getClass().getClassLoader(), null, null);
     }
 
-    @Test
-    @DisplayName("Verify that generated source files can compiled")
-    public void testCompilation() throws Throwable {
-        generator.generate(sourcePackageName);
-        File outputDir = new FileWriter(generator, TARGET_PATH.toString(), targetPackageName, true).persist();
-
-        assertThat(outputDir.list()).contains(TARGET_SUB_PATH);
-        File subDir = new File(outputDir, TARGET_SUB_PATH);
-
-        List<JavaFileObject> sources = Files.walk(subDir.toPath())
-                .filter(Files::isRegularFile)
-                .map(Path::toUri)
-                .map(this::toUrl)
-                .map(JavaFileObjects::forResource)
-                .collect(toList());
-
-        Compilation compilation = javac()
-                .withClasspath(getClassPathEntries())
-                .compile(sources);
-        assertThat(compilation).succeeded();
-        assertThat(compilation.diagnostics()).allSatisfy(note -> {
-            assertThat(note.getKind()).isEqualTo(NOTE);
-        });
-
-        assertTrue(Files.isDirectory(subDir.toPath()));
-    }
 }

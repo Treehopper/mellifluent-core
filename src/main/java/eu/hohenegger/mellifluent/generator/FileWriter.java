@@ -41,7 +41,7 @@ public class FileWriter {
         this.setAutoImports = setAutoImports;
     }
 
-    private CtPackage recGetLeafPackage(CtPackage rootPackage) {
+    CtPackage recGetLeafPackage(CtPackage rootPackage) {
         Iterator<CtPackage> iterator = rootPackage.getPackages().iterator();
         if (!iterator.hasNext()) {
             return rootPackage;

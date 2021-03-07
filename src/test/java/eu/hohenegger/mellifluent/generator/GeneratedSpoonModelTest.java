@@ -21,6 +21,7 @@ package eu.hohenegger.mellifluent.generator;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static spoon.reflect.declaration.ModifierKind.PUBLIC;
 
@@ -34,6 +35,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import spoon.reflect.code.CtReturn;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtType;
 
@@ -70,6 +72,8 @@ public class GeneratedSpoonModelTest extends AbstractGeneratedSpoonModelTest {
         assertThat(getMethods).allSatisfy(method -> {
             assertThat(method.getAnnotation(Override.class)).isNotNull();
             assertThat(method.getVisibility()).isEqualTo(PUBLIC);
+            assertThat(method.getBody().getStatements()).isNotEmpty();
+            assertTrue(method.getBody().getLastStatement() instanceof CtReturn);
         });
     }
 
