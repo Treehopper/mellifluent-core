@@ -33,6 +33,7 @@ public class FileWriter {
     public FileWriter(AbstractFluentGenerator<Class<?>> generator, String outputPath, String targetPackage, boolean setAutoImports) {
         this.launcher = generator.getLauncher();
         this.launcher.getEnvironment().setCommentEnabled(false);
+        this.launcher.getEnvironment().disableConsistencyChecks();
 
         CtPackage leafPackage = recGetLeafPackage(launcher.getModel().getRootPackage());
         leafPackage.setSimpleName(targetPackage);

@@ -52,6 +52,7 @@ public abstract class AbstractFluentGenerator<T extends Class> {
         parsingLauncher = new Launcher();
 
         parsingLauncher.getModelBuilder().addInputSource(root.toFile());
+        parsingLauncher.getEnvironment().disableConsistencyChecks();
         parsingLauncher.getEnvironment().setCommentEnabled(false);
         parsingLauncher.getEnvironment().setNoClasspath(false);
         parsingLauncher.getEnvironment().setInputClassLoader(classLoader);
