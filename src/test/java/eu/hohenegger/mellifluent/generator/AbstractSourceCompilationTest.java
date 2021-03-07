@@ -41,7 +41,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class AbstractSourceCompilationTest {
+public abstract class AbstractSourceCompilationTest {
 
     public static final Path TARGET_PATH = Paths.get("target/generated-sources/java");
     public static final String TARGET_SUB_PATH = "foo";

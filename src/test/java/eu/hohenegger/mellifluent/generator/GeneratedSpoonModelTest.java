@@ -38,7 +38,7 @@ import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtType;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@DisplayName("Generated Spoon Model Test")
+@DisplayName("Generated Assisted Spoon Model Test")
 public class GeneratedSpoonModelTest extends AbstractGeneratedSpoonModelTest {
 
     @BeforeAll

@@ -28,7 +28,6 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -36,9 +35,7 @@ import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtPackage;
 import spoon.reflect.declaration.CtType;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@DisplayName("Generated Spoon Model Test")
-public class AbstractGeneratedSpoonModelTest {
+public abstract class AbstractGeneratedSpoonModelTest {
 
     protected static List<CtType<Object>> generated;
     protected static String sourcePackageName;

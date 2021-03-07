@@ -29,7 +29,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.TestInstance;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@DisplayName("Generated Spoon Model Test")
+@DisplayName("Generated Fluent Spoon Model Test")
 public class GeneratedUnassistedSpoonModelTest extends AbstractGeneratedSpoonModelTest {
 
     @BeforeAll
