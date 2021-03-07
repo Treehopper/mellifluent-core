@@ -81,7 +81,7 @@ public abstract class AbstractFluentGenerator<T extends Class> {
 
         parsingLauncher.buildModel();
 
-        generatorLauncher = new Launcher();
+        generatorLauncher = parsingLauncher;
         model = generatorLauncher.getModel();
     }
 
@@ -131,7 +131,7 @@ public abstract class AbstractFluentGenerator<T extends Class> {
 //        });
         parsingLauncher.buildModel();
 
-        generatorLauncher = new Launcher();
+        generatorLauncher = parsingLauncher;
         model = generatorLauncher.getModel();
     }
 
@@ -148,7 +148,7 @@ public abstract class AbstractFluentGenerator<T extends Class> {
     abstract protected Filter<CtType<?>> createFilter(String packageName);
 
     public final List<CtType<Object>> generate(String packageName) throws GeneratorException {
-        typeFactory = new Launcher().getFactory();
+        typeFactory = generatorLauncher.getFactory();
         if (progressListener != null) {
             progressListener.accept("Writing to package: " + packageName);
         }
