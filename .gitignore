@@ -84,7 +84,7 @@ local.properties
 .loadpath
 .recommenders
 .project
-.classpath
+# .classpath # keep these to work around test issues in vscode
 .checkstyle
 
 # External tool builders
