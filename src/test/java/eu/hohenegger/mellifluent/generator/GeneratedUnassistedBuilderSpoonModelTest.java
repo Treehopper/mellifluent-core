@@ -21,7 +21,7 @@ package eu.hohenegger.mellifluent.generator;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static spoon.reflect.declaration.ModifierKind.PUBLIC;
 
 import java.nio.file.Path;
@@ -36,6 +36,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import spoon.reflect.code.CtReturn;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtPackage;
 import spoon.reflect.declaration.CtType;
@@ -58,12 +59,8 @@ public class GeneratedUnassistedBuilderSpoonModelTest {
         Path folder = SRC_PATH.resolve(SRC_PACKAGE_FOLDER_NAME);
         generator.setup(folder, GeneratedUnassistedBuilderSpoonModelTest.class.getClassLoader(), null, null);
 
-        try {
-            sourcePackageName = SRC_PACKAGE_FOLDER_NAME.replace('/', '.');
-            generated = generator.generate(sourcePackageName);
-        } catch (GeneratorException e) {
-            fail(e);
-        }
+        sourcePackageName = SRC_PACKAGE_FOLDER_NAME.replace('/', '.');
+        generated = generator.generate(sourcePackageName);
     }
 
     private static Stream<CtType<Object>> ctTypes(){
@@ -80,6 +77,7 @@ public class GeneratedUnassistedBuilderSpoonModelTest {
         assertThat(withMethods).allSatisfy(method -> {
             assertThat(method.getVisibility()).isEqualTo(PUBLIC);
             assertThat(method.getType()).isEqualTo(ctType.getReference());
+            assertThat(method.getBody().getStatements()).isNotEmpty();
         });
 
         List<CtMethod<?>> selfMethods = ctType.getMethodsByName("self");
@@ -87,12 +85,16 @@ public class GeneratedUnassistedBuilderSpoonModelTest {
         assertThat(selfMethods).allSatisfy(method -> {
             assertThat(method.getAnnotation(Override.class)).isNotNull();
             assertThat(method.getType()).isEqualTo(ctType.getReference());
+            assertThat(method.getBody().getStatements()).isNotEmpty();
+            assertTrue(method.getBody().getLastStatement() instanceof CtReturn);
         });
 
         List<CtMethod<?>> buildMethods = ctType.getMethodsByName("build");
         assertThat(buildMethods).isNotEmpty();
         assertThat(buildMethods).allSatisfy(method -> {
             assertThat(method.getParameters()).isEmpty();
+            assertThat(method.getBody().getStatements()).isNotEmpty();
+            assertTrue(method.getBody().getLastStatement() instanceof CtReturn);
         });
     }
 

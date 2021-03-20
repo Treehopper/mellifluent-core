@@ -32,13 +32,11 @@ import java.util.Set;
 
 import javax.inject.Named;
 
-import eu.hohenegger.mellifluent.generator.api.FIAbstractFluentBuilder;
 import eu.hohenegger.mellifluent.generator.api.FIBuilderBuilder;
 import eu.hohenegger.mellifluent.generator.api.FIFieldBuilder;
 import eu.hohenegger.mellifluent.generator.api.FIFieldWriteBuilder;
 import eu.hohenegger.mellifluent.generator.api.FIGenerateSelfOverrideMethodBuilder;
 import eu.hohenegger.mellifluent.generator.api.FIInstantiationBuilder;
-import eu.hohenegger.mellifluent.generator.api.FIPackageBuilder;
 import eu.hohenegger.mellifluent.generator.api.FIWithPropertyMethodBuilder;
 import eu.hohenegger.mellifluent.generator.model.Util;
 import spoon.reflect.code.CtAssignment;
@@ -49,6 +47,7 @@ import spoon.reflect.code.CtReturn;
 import spoon.reflect.code.CtStatement;
 import spoon.reflect.code.CtVariableAccess;
 import spoon.reflect.code.CtVariableRead;
+import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtNamedElement;
@@ -65,17 +64,8 @@ import spoon.reflect.visitor.Filter;
 import spoon.support.reflect.code.CtLocalVariableImpl;
 import spoon.support.reflect.declaration.CtMethodImpl;
 
-@Named("FluentBuilderGenerator")
+@Named("UnassistedFluentBuilderGenerator")
 public class UnassistedFluentBuilderGenerator<T extends Class> extends AbstractFluentGenerator<T> {
-
-    private CtPackage builderPackage;
-    private CtType<?> abstractBuilder;
-
-    @Override
-    protected void preRewrite(String packageName) {
-        abstractBuilder = new FIAbstractFluentBuilder().withTypeFactory(typeFactory).build();
-        builderPackage = new FIPackageBuilder().withTypeFactory(typeFactory).withPackageName(packageName).build();
-    }
 
     @Override
     protected void postRewrite() {
@@ -83,10 +73,10 @@ public class UnassistedFluentBuilderGenerator<T extends Class> extends AbstractF
     }
 
     @Override
-    protected CtType<Object> rewriteClass(CtType<T> buildable) {
+    protected CtClass<?> rewriteClass(CtType<T> buildable) {
         String builderName = buildable.getSimpleName() + "Builder";
 
-        CtType<Object> builderClass = typeFactory.createClass(builderName);
+        CtClass<?> builderClass = typeFactory.createClass(builderName);
         builderClass.setSuperclass(abstractBuilder.getReference());
         List<CtTypeParameter> buildableClassTypeParameters = buildable.getFormalCtTypeParameters();
         builderClass.setFormalCtTypeParameters(buildableClassTypeParameters);

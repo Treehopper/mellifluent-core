@@ -19,8 +19,6 @@
  */
 package eu.hohenegger.mellifluent.generator;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -29,7 +27,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.TestInstance;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@DisplayName("Generated Spoon Model Test")
+@DisplayName("Generated Fluent Spoon Model Test")
 public class GeneratedUnassistedSpoonModelTest extends AbstractGeneratedSpoonModelTest {
 
     @BeforeAll
@@ -42,12 +40,8 @@ public class GeneratedUnassistedSpoonModelTest extends AbstractGeneratedSpoonMod
         Path folder = srcPath.resolve(srcPackageFolderName);
         generator.setup(folder, GeneratedSourceCompilationTest.class.getClassLoader(), null, null);
 
-        try {
-            sourcePackageName = srcPackageFolderName.replace('/', '.');
-            generated = generator.generate(sourcePackageName);
-        } catch (GeneratorException e) {
-            fail(e);
-        }
+        sourcePackageName = srcPackageFolderName.replace('/', '.');
+        generated = generator.generate(sourcePackageName);
     }
 
 }

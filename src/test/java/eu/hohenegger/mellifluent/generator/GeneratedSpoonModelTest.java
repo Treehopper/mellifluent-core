@@ -21,7 +21,7 @@ package eu.hohenegger.mellifluent.generator;
 
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static spoon.reflect.declaration.ModifierKind.PUBLIC;
 
 import java.nio.file.Path;
@@ -34,11 +34,12 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import spoon.reflect.code.CtReturn;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtType;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@DisplayName("Generated Spoon Model Test")
+@DisplayName("Generated Assisted Spoon Model Test")
 public class GeneratedSpoonModelTest extends AbstractGeneratedSpoonModelTest {
 
     @BeforeAll
@@ -51,12 +52,8 @@ public class GeneratedSpoonModelTest extends AbstractGeneratedSpoonModelTest {
         Path folder = srcPath.resolve(srcPackageFolderName);
         generator.setup(folder, GeneratedSourceCompilationTest.class.getClassLoader(), null, null);
 
-        try {
-            sourcePackageName = srcPackageFolderName.replace('/', '.');
-            generated = generator.generate(sourcePackageName);
-        } catch (GeneratorException e) {
-            fail(e);
-        }
+        sourcePackageName = srcPackageFolderName.replace('/', '.');
+        generated = generator.generate(sourcePackageName);
     }
 
     @DisplayName("Verify Get Methods for")
@@ -70,6 +67,8 @@ public class GeneratedSpoonModelTest extends AbstractGeneratedSpoonModelTest {
         assertThat(getMethods).allSatisfy(method -> {
             assertThat(method.getAnnotation(Override.class)).isNotNull();
             assertThat(method.getVisibility()).isEqualTo(PUBLIC);
+            assertThat(method.getBody().getStatements()).isNotEmpty();
+            assertTrue(method.getBody().getLastStatement() instanceof CtReturn);
         });
     }
 

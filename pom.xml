@@ -6,7 +6,7 @@
     <artifactId>mellifluent-core</artifactId>
     <groupId>com.github.Treehopper</groupId>
     <packaging>jar</packaging>
-    <version>1.2.0</version>
+    <version>1.3.0</version>
 
     <properties>
         <junit5.version>5.7.1</junit5.version>
@@ -15,8 +15,8 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <mellifluent.maven.plugin.version>1.1.0</mellifluent.maven.plugin.version>
-        <spoon.version>7.5.0</spoon.version>
+        <mellifluent.maven.plugin.version>1.2.0</mellifluent.maven.plugin.version>
+        <spoon.version>7.6.0</spoon.version>
     </properties>
 
     <licenses>
@@ -82,6 +82,17 @@
             <version>0.19</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>3.7.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>3.8.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -93,7 +104,7 @@
                 <executions>
                     <execution>
                         <goals>
-                            <goal>generate-fluent</goal>
+                            <goal>assisted-generate-fluent</goal>
                         </goals>
                         <configuration>
                             <skip>false</skip>

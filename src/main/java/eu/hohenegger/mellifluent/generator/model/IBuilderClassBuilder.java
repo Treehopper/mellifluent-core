@@ -19,14 +19,14 @@
  */
 package eu.hohenegger.mellifluent.generator.model;
 
-import spoon.reflect.declaration.CtType;
+import spoon.reflect.declaration.CtClass;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 
 public interface IBuilderClassBuilder {
 
-    default CtType<Object>  build() {
-        CtType<Object> builderClass = getTypeFactory().createClass(getBuilderName());
+    default CtClass<?> build() {
+        CtClass<?> builderClass = getTypeFactory().createClass(getBuilderName());
         builderClass.setSuperclass(getAbstractBuilderReference());
         builderClass.addSuperInterface(getBuildableReference());
         return builderClass;

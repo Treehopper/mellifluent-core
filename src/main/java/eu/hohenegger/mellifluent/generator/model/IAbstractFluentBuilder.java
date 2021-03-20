@@ -19,15 +19,15 @@
  */
 package eu.hohenegger.mellifluent.generator.model;
 
+import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtMethod;
-import spoon.reflect.declaration.CtType;
 import spoon.reflect.declaration.ModifierKind;
 import spoon.reflect.factory.Factory;
 
 public interface IAbstractFluentBuilder {
 
-    default CtType<?> build() {
-        CtType<?> result = getTypeFactory().createClass("AbstractFluentBuilder");
+    default CtClass<?> build() {
+        CtClass<?> result = getTypeFactory().createClass("AbstractFluentBuilder");
         result.addModifier(ModifierKind.PUBLIC);
         result.addModifier(ModifierKind.ABSTRACT);
         CtMethod selfMethod = getTypeFactory().createMethod();

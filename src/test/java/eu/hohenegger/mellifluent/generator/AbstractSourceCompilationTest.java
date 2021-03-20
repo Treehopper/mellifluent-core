@@ -19,11 +19,16 @@
  */
 package eu.hohenegger.mellifluent.generator;
 
+import static com.google.testing.compile.CompilationSubject.assertThat;
+import static com.google.testing.compile.Compiler.javac;
 import static java.io.File.pathSeparator;
 import static java.util.Comparator.reverseOrder;
 import static java.util.stream.Collectors.toList;
+import static javax.tools.Diagnostic.Kind.NOTE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.contentOf;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.File;
@@ -37,11 +42,18 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
 
+import javax.tools.JavaFileObject;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class AbstractSourceCompilationTest {
+import com.google.testing.compile.Compilation;
+import com.google.testing.compile.JavaFileObjects;
+
+import spoon.reflect.declaration.CtClass;
+
+public abstract class AbstractSourceCompilationTest {
 
     public static final Path TARGET_PATH = Paths.get("target/generated-sources/java");
     public static final String TARGET_SUB_PATH = "foo";
@@ -57,8 +69,8 @@ public class AbstractSourceCompilationTest {
     @Test
     @DisplayName("Verify that target contain expected folder")
     public void testTargetFolderStructure() throws Throwable {
-        generator.generate(sourcePackageName);
-        File outputDir = new FileWriter(generator, TARGET_PATH.toString(), targetPackageName, true).persist();
+        List<CtClass<?>> list = generator.generate(sourcePackageName);
+        File outputDir = new FileWriter(list, targetPackageName, TARGET_PATH.toFile(), true).persist();
 
         assertThat(outputDir.list()).contains(TARGET_SUB_PATH);
     }
@@ -90,5 +102,76 @@ public class AbstractSourceCompilationTest {
         String[] classpathEntries = classpath.split(pathSeparator);
         return Stream.of(classpathEntries).map(entry -> new File(entry)).collect(toList());
     }
+
+    @Test
+    @DisplayName("Verify the FileWrite")
+    public void testFileWriter() throws Throwable {
+        List<CtClass<?>> list = generator.generate(sourcePackageName);
+        FileWriter fileWriter = new FileWriter(list, targetPackageName, TARGET_PATH.toFile(), true);
+//        assertThat(fileWriter.recGetLeafPackage(generator.getLauncher()
+//                .getModel()
+//                .getRootPackage())
+//                .getSimpleName())
+//            .isEqualTo("foo.bar");
+    }
+
+    @Test
+    @DisplayName("Verify that generated source files contain expected content")
+    public void testContent() throws Throwable {
+        List<CtClass<?>> list = generator.generate(sourcePackageName);
+        File outputDir = new FileWriter(list, targetPackageName, TARGET_PATH.toFile(), true).persist();
+    
+            assertThat(outputDir.list()).contains(TARGET_SUB_PATH);
+            File subDir = new File(outputDir, TARGET_SUB_PATH);
+    
+            
+            assertThat(Files.walk(subDir.toPath())
+                                    .filter(Files::isRegularFile)
+                                    .map(Path::toFile)
+                                    )
+                    .isNotEmpty()
+                    .allSatisfy(file -> {
+                        assertThat(contentOf(file))
+                            .contains("class")
+                            .contains("self()")
+                            .satisfiesAnyOf(
+                                    content -> {
+                                        content.contains("return");
+                                    }, content -> {
+                                        content.contains("abstract class");
+                                    });
+                    });
+    
+    }
+
+    @Test
+    @DisplayName("Verify that generated source files can compiled")
+    public void testCompilation() throws Throwable {
+        List<CtClass<?>> list = generator.generate(sourcePackageName);
+        list.add(generator.getAbstractBuilder());
+        File outputDir = new FileWriter(list, targetPackageName, TARGET_PATH.toFile(), true).persist();
+
+        assertThat(outputDir.list()).contains(TARGET_SUB_PATH);
+        File subDir = new File(outputDir, TARGET_SUB_PATH);
+            
+            List<JavaFileObject> sources = Files.walk(subDir.toPath())
+                    .filter(Files::isRegularFile)
+                    .map(Path::toUri)
+                    .map(this::toUrl)
+                    .map(JavaFileObjects::forResource)
+                    .collect(toList());
+            
+            Compilation compilation = javac()
+                    .withClasspath(getClassPathEntries())
+                    .compile(sources);
+            assertThat(compilation).succeeded();
+            assertThat(compilation.generatedFiles())
+                    .isNotEmpty();
+            assertThat(compilation.diagnostics()).allSatisfy(note -> {
+                assertThat(note.getKind()).isEqualTo(NOTE);
+            });
+    
+            assertTrue(Files.isDirectory(subDir.toPath()));
+        }
 
 }
