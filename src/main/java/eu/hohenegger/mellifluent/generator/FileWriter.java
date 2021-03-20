@@ -2,7 +2,7 @@
  * #%L
  * mellifluent-core
  * %%
- * Copyright (C) 2020 - 2021 Max Hohenegger <mellifluent@hohenegger.eu>
+ * Copyright (C) 2021 Max Hohenegger <mellifluent@hohenegger.eu>
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,42 +20,66 @@
 package eu.hohenegger.mellifluent.generator;
 
 import java.io.File;
-import java.util.Iterator;
+import java.util.List;
 
-import spoon.SpoonAPI;
+import spoon.Launcher;
+import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtPackage;
+import spoon.reflect.factory.Factory;
+import spoon.reflect.factory.FactoryImpl;
+import spoon.support.DefaultCoreFactory;
+import spoon.support.reflect.declaration.CtPackageImpl;
 
-public class FileWriter {
-    private SpoonAPI launcher;
-    private String outputPath;
-    private boolean setAutoImports;
+public final class FileWriter extends Launcher {
 
-    public FileWriter(AbstractFluentGenerator<Class<?>> generator, String outputPath, String targetPackage, boolean setAutoImports) {
-        this.launcher = generator.getLauncher();
-        this.launcher.getEnvironment().setCommentEnabled(false);
+    private boolean autoImports;
 
-        CtPackage leafPackage = recGetLeafPackage(launcher.getModel().getRootPackage());
-        leafPackage.setSimpleName(targetPackage);
+    private final class WriterFactory extends FactoryImpl {
 
-        this.outputPath = outputPath;
-        this.setAutoImports = setAutoImports;
+        private static final long serialVersionUID = 1L;
+
+        private WriterFactory() {
+            super(new DefaultCoreFactory(), createEnvironment());
+        }
+
+        private void init(List<CtClass<?>> clazzes, String packageName, File sourceOutputDirectory) {
+            CtPackage pack = createPackageHierarchy(packageName, getModel().getRootPackage());
+            clazzes.stream().map(CtClass::clone).forEach(clazz -> {
+                clazz.setFactory(this);
+                pack.addType(clazz);
+            });
+            setSourceOutputDirectory(sourceOutputDirectory);
+            getEnvironment().setAutoImports(autoImports);
+            getEnvironment().setCommentEnabled(false);
+        }
+
+        private CtPackage createPackageHierarchy(String packageName, CtPackage parent) {
+            String[] segments = packageName.split("\\.");
+            CtPackage currentPackage = null;
+            for (int i = 0; i < segments.length; i++) {
+                currentPackage = new CtPackageImpl();
+                currentPackage.setSimpleName(segments[i]);
+                parent.addPackage(currentPackage);
+                parent = currentPackage;
+            }
+            return currentPackage;
+        }
     }
 
-    CtPackage recGetLeafPackage(CtPackage rootPackage) {
-        Iterator<CtPackage> iterator = rootPackage.getPackages().iterator();
-        if (!iterator.hasNext()) {
-            return rootPackage;
-        }
-        return recGetLeafPackage(iterator.next());
+    public FileWriter(List<CtClass<?>> clonedClasses, String packageName, File sourceOutputDirectory, boolean autoImports) {
+        this.autoImports = autoImports;
+        WriterFactory writerFactory = (WriterFactory) getFactory();
+        writerFactory.init(clonedClasses, packageName, sourceOutputDirectory);
+    }
+
+    @Override
+    public Factory createFactory() {
+        return new WriterFactory();
     }
 
     public File persist() {
-        if (outputPath == null) {
-            throw new IllegalStateException();
-        }
-        launcher.setSourceOutputDirectory(outputPath);
-        launcher.getEnvironment().setAutoImports(setAutoImports);
-        launcher.prettyprint();
-        return launcher.getEnvironment().getOutputDestinationHandler().getDefaultOutputDirectory();
+        prettyprint();
+        return getEnvironment().getOutputDestinationHandler()
+                .getDefaultOutputDirectory();
     }
 }

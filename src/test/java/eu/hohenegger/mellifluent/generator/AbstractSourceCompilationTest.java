@@ -51,6 +51,8 @@ import org.junit.jupiter.api.Test;
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.JavaFileObjects;
 
+import spoon.reflect.declaration.CtClass;
+
 public abstract class AbstractSourceCompilationTest {
 
     public static final Path TARGET_PATH = Paths.get("target/generated-sources/java");
@@ -67,8 +69,8 @@ public abstract class AbstractSourceCompilationTest {
     @Test
     @DisplayName("Verify that target contain expected folder")
     public void testTargetFolderStructure() throws Throwable {
-        generator.generate(sourcePackageName);
-        File outputDir = new FileWriter(generator, TARGET_PATH.toString(), targetPackageName, true).persist();
+        List<CtClass<?>> list = generator.generate(sourcePackageName);
+        File outputDir = new FileWriter(list, targetPackageName, TARGET_PATH.toFile(), true).persist();
 
         assertThat(outputDir.list()).contains(TARGET_SUB_PATH);
     }
@@ -104,20 +106,20 @@ public abstract class AbstractSourceCompilationTest {
     @Test
     @DisplayName("Verify the FileWrite")
     public void testFileWriter() throws Throwable {
-        generator.generate(sourcePackageName);
-        FileWriter fileWriter = new FileWriter(generator, TARGET_PATH.toString(), targetPackageName, true);
-        assertThat(fileWriter.recGetLeafPackage(generator.getLauncher()
-                .getModel()
-                .getRootPackage())
-                .getSimpleName())
-            .isEqualTo("foo.bar");
+        List<CtClass<?>> list = generator.generate(sourcePackageName);
+        FileWriter fileWriter = new FileWriter(list, targetPackageName, TARGET_PATH.toFile(), true);
+//        assertThat(fileWriter.recGetLeafPackage(generator.getLauncher()
+//                .getModel()
+//                .getRootPackage())
+//                .getSimpleName())
+//            .isEqualTo("foo.bar");
     }
 
     @Test
     @DisplayName("Verify that generated source files contain expected content")
     public void testContent() throws Throwable {
-            generator.generate(sourcePackageName);
-            File outputDir = new FileWriter(generator, TARGET_PATH.toString(), targetPackageName, true).persist();
+        List<CtClass<?>> list = generator.generate(sourcePackageName);
+        File outputDir = new FileWriter(list, targetPackageName, TARGET_PATH.toFile(), true).persist();
     
             assertThat(outputDir.list()).contains(TARGET_SUB_PATH);
             File subDir = new File(outputDir, TARGET_SUB_PATH);
@@ -145,9 +147,9 @@ public abstract class AbstractSourceCompilationTest {
     @Test
     @DisplayName("Verify that generated source files can compiled")
     public void testCompilation() throws Throwable {
-        generator.generate(sourcePackageName);
-        File outputDir = new FileWriter(generator, TARGET_PATH.toString(),
-                targetPackageName, true).persist();
+        List<CtClass<?>> list = generator.generate(sourcePackageName);
+        list.add(generator.getAbstractBuilder());
+        File outputDir = new FileWriter(list, targetPackageName, TARGET_PATH.toFile(), true).persist();
 
         assertThat(outputDir.list()).contains(TARGET_SUB_PATH);
         File subDir = new File(outputDir, TARGET_SUB_PATH);
@@ -165,13 +167,6 @@ public abstract class AbstractSourceCompilationTest {
             assertThat(compilation).succeeded();
             assertThat(compilation.generatedFiles())
                     .isNotEmpty();
-    //        assertThat(compilation.generatedFiles())
-    //        .isNotEmpty()
-    //        .allSatisfy(generatedFile -> {
-    //            JavaFileObjectSubject.assertThat(generatedFile)
-    //                    .contentsAsUtf8String()
-    //                    .containsMatch("build");
-    //});
             assertThat(compilation.diagnostics()).allSatisfy(note -> {
                 assertThat(note.getKind()).isEqualTo(NOTE);
             });

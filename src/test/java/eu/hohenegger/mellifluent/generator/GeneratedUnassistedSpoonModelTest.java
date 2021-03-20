@@ -19,8 +19,6 @@
  */
 package eu.hohenegger.mellifluent.generator;
 
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -42,12 +40,8 @@ public class GeneratedUnassistedSpoonModelTest extends AbstractGeneratedSpoonMod
         Path folder = srcPath.resolve(srcPackageFolderName);
         generator.setup(folder, GeneratedSourceCompilationTest.class.getClassLoader(), null, null);
 
-        try {
-            sourcePackageName = srcPackageFolderName.replace('/', '.');
-            generated = generator.generate(sourcePackageName);
-        } catch (GeneratorException e) {
-            fail(e);
-        }
+        sourcePackageName = srcPackageFolderName.replace('/', '.');
+        generated = generator.generate(sourcePackageName);
     }
 
 }

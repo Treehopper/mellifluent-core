@@ -22,7 +22,6 @@ package eu.hohenegger.mellifluent.generator;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static spoon.reflect.declaration.ModifierKind.PUBLIC;
 
 import java.nio.file.Path;
@@ -53,12 +52,8 @@ public class GeneratedSpoonModelTest extends AbstractGeneratedSpoonModelTest {
         Path folder = srcPath.resolve(srcPackageFolderName);
         generator.setup(folder, GeneratedSourceCompilationTest.class.getClassLoader(), null, null);
 
-        try {
-            sourcePackageName = srcPackageFolderName.replace('/', '.');
-            generated = generator.generate(sourcePackageName);
-        } catch (GeneratorException e) {
-            fail(e);
-        }
+        sourcePackageName = srcPackageFolderName.replace('/', '.');
+        generated = generator.generate(sourcePackageName);
     }
 
     @DisplayName("Verify Get Methods for")

@@ -27,9 +27,12 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import eu.hohenegger.mellifluent.generator.api.FIAbstractFluentBuilder;
+import eu.hohenegger.mellifluent.generator.api.FIPackageBuilder;
 import eu.hohenegger.mellifluent.generator.model.Util;
 import spoon.Launcher;
 import spoon.reflect.CtModel;
+import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtPackage;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.factory.Factory;
@@ -43,9 +46,10 @@ public abstract class AbstractFluentGenerator<T extends Class> {
     protected Launcher parsingLauncher;
     protected CtModel model;
     protected Factory typeFactory;
+    protected CtPackage builderPackage;
+    protected CtClass<?> abstractBuilder;
 
     private Launcher generatorLauncher;
-
     private Consumer<CharSequence> progressListener;
 
     public void setup(Path root, ClassLoader classLoader, List<String> classPath, Consumer<CharSequence> progressListener) {
@@ -137,17 +141,20 @@ public abstract class AbstractFluentGenerator<T extends Class> {
 
     abstract CtPackage getGeneratedPackage();
 
-    abstract protected void preRewrite(String packageName);
+    protected void preRewrite(String packageName) {
+        abstractBuilder = new FIAbstractFluentBuilder().withTypeFactory(typeFactory).build();
+        builderPackage = new FIPackageBuilder().withTypeFactory(typeFactory).withPackageName(packageName).build();
+    }
 
     abstract protected void postRewrite();
 
-    private List<CtType<Object>> rewrite(List<CtType<T>> buildables) {
+    private List<CtClass<?>> rewrite(List<CtType<T>> buildables) {
         return buildables.stream().map(this::rewriteClass).collect(toList());
     }
 
     abstract protected Filter<CtType<?>> createFilter(String packageName);
 
-    public final List<CtType<Object>> generate(String packageName) throws GeneratorException {
+    public final List<CtClass<?>> generate(String packageName) {
         typeFactory = new Launcher().getFactory();
         if (progressListener != null) {
             progressListener.accept("Writing to package: " + packageName);
@@ -158,19 +165,19 @@ public abstract class AbstractFluentGenerator<T extends Class> {
         if (progressListener != null) {
             progressListener.accept("Found buildable classes: " + buildables.stream().map(CtType::getSimpleName).collect(Collectors.joining(",")));
         }
-        List<CtType<Object>> result = rewrite(buildables);
+        List<CtClass<?>> result = rewrite(buildables);
         if (progressListener != null) {
             progressListener.accept("Writing: " + result.stream().map(CtType::getSimpleName).collect(Collectors.joining(",")));
         }
-        
+
         postRewrite();
         return result;
     }
 
-    abstract protected CtType<Object> rewriteClass(CtType<T> buildable);
+    abstract protected CtClass<?> rewriteClass(CtType<T> buildable);
 
-    public Launcher getLauncher() {
-        return generatorLauncher;
+    public CtClass<?> getAbstractBuilder() {
+        return abstractBuilder;
     }
 
 }

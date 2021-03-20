@@ -23,7 +23,6 @@ import java.util.Set;
 
 import javax.inject.Named;
 
-import eu.hohenegger.mellifluent.generator.api.FIAbstractFluentBuilder;
 import eu.hohenegger.mellifluent.generator.api.FIBuildMethodBuilder;
 import eu.hohenegger.mellifluent.generator.api.FIBuilderBuilder;
 import eu.hohenegger.mellifluent.generator.api.FIBuilderClassBuilder;
@@ -31,10 +30,10 @@ import eu.hohenegger.mellifluent.generator.api.FIFieldBuilder;
 import eu.hohenegger.mellifluent.generator.api.FIFieldWriteBuilder;
 import eu.hohenegger.mellifluent.generator.api.FIGenerateSelfOverrideMethodBuilder;
 import eu.hohenegger.mellifluent.generator.api.FIGetterBuilder;
-import eu.hohenegger.mellifluent.generator.api.FIPackageBuilder;
 import eu.hohenegger.mellifluent.generator.api.FIWithPropertyMethodBuilder;
 import eu.hohenegger.mellifluent.generator.model.Util;
 import spoon.reflect.code.CtVariableAccess;
+import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtPackage;
@@ -44,25 +43,16 @@ import spoon.reflect.visitor.Filter;
 @Named("FluentBuilderGenerator")
 public class FluentBuilderGenerator<T extends Class> extends AbstractFluentGenerator<T> {
 
-    private CtPackage builderPackage;
-    private CtType<?> abstractBuilder;
-
-    @Override
-    protected void preRewrite(String packageName) {
-        abstractBuilder = new FIAbstractFluentBuilder().withTypeFactory(typeFactory).build();
-        builderPackage = new FIPackageBuilder().withTypeFactory(typeFactory).withPackageName(packageName).build();
-    }
-
     @Override
     protected void postRewrite() {
         model.getRootPackage().addPackage(builderPackage);
     }
 
     @Override
-    protected CtType<Object> rewriteClass(CtType<T> buildable) {
+    protected CtClass<?> rewriteClass(CtType<T> buildable) {
         String builderName = "F" + buildable.getSimpleName();
 
-        CtType<Object> builderClass = new FIBuilderClassBuilder()
+        CtClass<?> builderClass = new FIBuilderClassBuilder()
                 .withTypeFactory(typeFactory)
                 .withBuilderName(builderName)
                 .withAbstractBuilderReference(abstractBuilder.getReference())
