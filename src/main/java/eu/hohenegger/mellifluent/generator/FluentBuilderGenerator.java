@@ -38,6 +38,7 @@ import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtPackage;
 import spoon.reflect.declaration.CtType;
+import spoon.reflect.declaration.ModifierKind;
 import spoon.reflect.visitor.Filter;
 
 @Named("FluentBuilderGenerator")
@@ -58,6 +59,7 @@ public class FluentBuilderGenerator<T extends Class> extends AbstractFluentGener
                 .withAbstractBuilderReference(abstractBuilder.getReference())
                 .withBuildableReference(buildable.getReference())
                 .build();
+        builderClass.setVisibility(ModifierKind.PUBLIC);
 
         CtMethod<?> selfOverrideMethod = new FIGenerateSelfOverrideMethodBuilder()
                 .withTypeFactory(typeFactory)

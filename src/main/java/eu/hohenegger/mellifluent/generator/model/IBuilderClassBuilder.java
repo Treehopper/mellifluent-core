@@ -20,6 +20,7 @@
 package eu.hohenegger.mellifluent.generator.model;
 
 import spoon.reflect.declaration.CtClass;
+import spoon.reflect.declaration.ModifierKind;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 
@@ -29,6 +30,7 @@ public interface IBuilderClassBuilder {
         CtClass<?> builderClass = getTypeFactory().createClass(getBuilderName());
         builderClass.setSuperclass(getAbstractBuilderReference());
         builderClass.addSuperInterface(getBuildableReference());
+        builderClass.setVisibility(ModifierKind.PUBLIC);
         return builderClass;
     }
 

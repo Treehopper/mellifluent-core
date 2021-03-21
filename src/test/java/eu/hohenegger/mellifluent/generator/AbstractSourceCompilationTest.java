@@ -132,7 +132,7 @@ public abstract class AbstractSourceCompilationTest {
                     .isNotEmpty()
                     .allSatisfy(file -> {
                         assertThat(contentOf(file))
-                            .contains("class")
+                            .contains("public class")
                             .contains("self()")
                             .satisfiesAnyOf(
                                     content -> {
