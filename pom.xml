@@ -15,7 +15,6 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <mellifluent.maven.plugin.version>1.2.0</mellifluent.maven.plugin.version>
         <spoon.version>7.6.0</spoon.version>
     </properties>
 
@@ -34,6 +33,13 @@
         </pluginRepository>
     </pluginRepositories>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>fr.inria.gforge.spoon</groupId>
@@ -44,6 +50,11 @@
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <version>1</version>
+        </dependency>
+        <dependency>
+            <artifactId>mellifluent-spoon</artifactId>
+            <groupId>com.github.Treehopper</groupId>
+            <version>1.0.1</version>
         </dependency>
 
         <dependency>
@@ -86,6 +97,7 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
             <version>3.8.0</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -97,48 +109,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>com.github.Treehopper</groupId>
-                <artifactId>mellifluent-maven-plugin</artifactId>
-                <version>${mellifluent.maven.plugin.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>assisted-generate-fluent</goal>
-                        </goals>
-                        <configuration>
-                            <skip>false</skip>
-                            <sourcePackage>eu.hohenegger.mellifluent.generator.model</sourcePackage>
-                            <targetPackage>eu.hohenegger.mellifluent.generator.api</targetPackage>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <id>add-source</id>
-                        <phase>process-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>${project.build.directory}/generated-sources/java</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
-            </plugin>
-
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>

@@ -45,7 +45,7 @@ public class GeneratedSpoonModelTest extends AbstractGeneratedSpoonModelTest {
     @BeforeAll
     public void setUp() {
         String srcPackageFolderName = "eu/hohenegger/mellifluent/generator/model";
-        Path srcPath = Paths.get("src/main/java");
+        Path srcPath = Paths.get("src/test/java");
 
         generator = new FluentBuilderGenerator<>();
 
