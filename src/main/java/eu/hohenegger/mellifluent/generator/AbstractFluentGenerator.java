@@ -122,17 +122,6 @@ public abstract class AbstractFluentGenerator<T extends Class> {
             });
         }
 
-//        parsingLauncher.getModelBuilder().addCompilationUnitFilter(new CompilationUnitFilter() {
-//
-//            @Override
-//            public boolean exclude(String path) {
-//                if (path.contains("osgi") || path.contains("jsap")) {
-//                    progressListener.accept("Filtered path" + ": " + path);
-//                    return true;
-//                }
-//                return false;
-//            }
-//        });
         parsingLauncher.buildModel();
 
         generatorLauncher = new Launcher();
@@ -148,13 +137,19 @@ public abstract class AbstractFluentGenerator<T extends Class> {
 
     abstract protected void postRewrite();
 
-    private List<CtClass<?>> rewrite(List<CtType<T>> buildables) {
-        return buildables.stream().map(this::rewriteClass).collect(toList());
+    private List<CtClass<?>> rewrite(List<CtType<T>> buildables, boolean includeInheritedMethods) {
+        return buildables.stream()
+                .map(classes -> rewriteClass(classes, includeInheritedMethods))
+                .collect(toList());
     }
 
     abstract protected Filter<CtType<?>> createFilter(String packageName);
 
     public final List<CtClass<?>> generate(String packageName) {
+        return generate(packageName, false);
+    }
+
+    public final List<CtClass<?>> generate(String packageName, boolean includeInheritedMethods) {
         typeFactory = new Launcher().getFactory();
         if (progressListener != null) {
             progressListener.accept("Writing to package: " + packageName);
@@ -162,10 +157,13 @@ public abstract class AbstractFluentGenerator<T extends Class> {
         preRewrite(packageName);
         Filter<CtType<?>> classFilter = createFilter(packageName);
         List<CtType<T>> buildables = Util.findClasses(classFilter, parsingLauncher.getModel());
+        if (buildables.isEmpty()) {
+            throw new IllegalArgumentException("No buildable classes found in " + packageName);
+        }
         if (progressListener != null) {
             progressListener.accept("Found buildable classes: " + buildables.stream().map(CtType::getSimpleName).collect(Collectors.joining(",")));
         }
-        List<CtClass<?>> result = rewrite(buildables);
+        List<CtClass<?>> result = rewrite(buildables, includeInheritedMethods);
         if (progressListener != null) {
             progressListener.accept("Writing: " + result.stream().map(CtType::getSimpleName).collect(Collectors.joining(",")));
         }
@@ -174,7 +172,7 @@ public abstract class AbstractFluentGenerator<T extends Class> {
         return result;
     }
 
-    abstract protected CtClass<?> rewriteClass(CtType<T> buildable);
+    abstract protected CtClass<?> rewriteClass(CtType<T> buildable, boolean includeInheritedMethods);
 
     public CtClass<?> getAbstractBuilder() {
         return abstractBuilder;

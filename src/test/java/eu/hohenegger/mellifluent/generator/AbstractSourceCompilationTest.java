@@ -104,18 +104,6 @@ public abstract class AbstractSourceCompilationTest {
     }
 
     @Test
-    @DisplayName("Verify the FileWrite")
-    public void testFileWriter() throws Throwable {
-        List<CtClass<?>> list = generator.generate(sourcePackageName);
-        FileWriter fileWriter = new FileWriter(list, targetPackageName, TARGET_PATH.toFile(), true);
-//        assertThat(fileWriter.recGetLeafPackage(generator.getLauncher()
-//                .getModel()
-//                .getRootPackage())
-//                .getSimpleName())
-//            .isEqualTo("foo.bar");
-    }
-
-    @Test
     @DisplayName("Verify that generated source files contain expected content")
     public void testContent() throws Throwable {
         List<CtClass<?>> list = generator.generate(sourcePackageName);
