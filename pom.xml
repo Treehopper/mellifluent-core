@@ -6,7 +6,7 @@
     <artifactId>mellifluent-core</artifactId>
     <groupId>com.github.Treehopper</groupId>
     <packaging>jar</packaging>
-    <version>1.5.0-SNAPSHOT</version>
+    <version>1.5.0</version>
 
     <properties>
         <junit5.version>5.7.1</junit5.version>
