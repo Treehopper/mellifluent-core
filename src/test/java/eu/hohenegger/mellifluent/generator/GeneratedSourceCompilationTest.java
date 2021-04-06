@@ -38,7 +38,7 @@ public class GeneratedSourceCompilationTest extends AbstractSourceCompilationTes
         sourcePackageName = SRC_PACKAGE_FOLDER_NAME.replace('/', '.');
         targetPackageName = TARGET_PACKAGE_FOLDER_NAME.replace('/', '.');
 
-        Path folder = Paths.get("src/main/java")
+        Path folder = Paths.get("src/test/java")
                 .resolve(SRC_PACKAGE_FOLDER_NAME);
         generator.setup(folder, getClass().getClassLoader(), null, null);
     }

@@ -46,7 +46,7 @@ import spoon.reflect.declaration.CtType;
 public class GeneratedUnassistedBuilderSpoonModelTest {
 
     private static final String SRC_PACKAGE_FOLDER_NAME = "eu/hohenegger/mellifluent/generator";
-    private static final Path SRC_PATH = Paths.get("src/main/java");
+    private static final Path SRC_PATH = Paths.get("src/test/java");
 
     private static UnassistedFluentBuilderGenerator generator;
     private static List<CtType<Object>> generated;

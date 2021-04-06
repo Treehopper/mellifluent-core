@@ -50,7 +50,7 @@ public class FluentBuilderGenerator<T extends Class> extends AbstractFluentGener
     }
 
     @Override
-    protected CtClass<?> rewriteClass(CtType<T> buildable) {
+    protected CtClass<?> rewriteClass(CtType<T> buildable, boolean includeInheritedMethods) {
         String builderName = "F" + buildable.getSimpleName();
 
         CtClass<?> builderClass = new FIBuilderClassBuilder()

@@ -73,7 +73,7 @@ public class UnassistedFluentBuilderGenerator<T extends Class> extends AbstractF
     }
 
     @Override
-    protected CtClass<?> rewriteClass(CtType<T> buildable) {
+    protected CtClass<?> rewriteClass(CtType<T> buildable, boolean includeInheritedMethods) {
         String builderName = buildable.getSimpleName() + "Builder";
 
         CtClass<?> builderClass = typeFactory.createClass(builderName);
@@ -99,7 +99,8 @@ public class UnassistedFluentBuilderGenerator<T extends Class> extends AbstractF
         }
 
         List<CtInvocation<Object>> setterCalls = new ArrayList<>();
-        Set<CtMethod<?>> methods = buildable.getMethods();
+
+        Set<CtMethod<?>> methods = includeInheritedMethods ? buildable.getAllMethods() : buildable.getMethods();
         for (CtMethod<?> method : methods) {
             if (!method.getSimpleName().startsWith("set")) {
                 continue;
