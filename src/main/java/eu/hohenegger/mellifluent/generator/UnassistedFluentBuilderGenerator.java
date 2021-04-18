@@ -19,6 +19,7 @@
  */
 package eu.hohenegger.mellifluent.generator;
 
+import static java.util.Collections.unmodifiableList;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -66,6 +67,8 @@ import spoon.support.reflect.declaration.CtMethodImpl;
 
 @Named("UnassistedFluentBuilderGenerator")
 public class UnassistedFluentBuilderGenerator<T extends Class> extends AbstractFluentGenerator<T> {
+
+    private List<String> excludes = Collections.emptyList();
 
     @Override
     protected void postRewrite() {
@@ -239,11 +242,15 @@ public class UnassistedFluentBuilderGenerator<T extends Class> extends AbstractF
 
     @Override
     protected Filter<CtType<?>> createFilter(String packageName) {
-        return new FilterForRegularClasses<T>(packageName);
+        return new FilterForRegularClasses<T>(packageName, excludes);
     }
 
     @Override
     CtPackage getGeneratedPackage() {
         return model.getRootPackage().clone();
+    }
+
+    public void setExcludes(List<String> excludes) {
+        this.excludes = unmodifiableList(excludes);
     }
 }

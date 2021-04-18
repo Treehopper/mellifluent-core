@@ -19,6 +19,7 @@
  */
 package eu.hohenegger.mellifluent.generator;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -30,9 +31,15 @@ import spoon.reflect.visitor.Filter;
 
 final class FilterForRegularClasses<T> implements Filter<CtType<?>> {
     private final String packageName;
+    private List<String> excludes;
 
     FilterForRegularClasses(String packageName) {
+        this(packageName, Collections.emptyList());
+    }
+
+    FilterForRegularClasses(String packageName, List<String> excludes) {
         this.packageName = packageName;
+        this.excludes = excludes;
     }
 
     @Override
@@ -53,6 +60,10 @@ final class FilterForRegularClasses<T> implements Filter<CtType<?>> {
         }
         if (element.isInterface() || element.isEnum() || element.isAbstract() || element.isLocalType()
                 || element.isPrivate() || element.isAnonymous()) {
+            return false;
+        }
+
+        if (excludes.contains(element.getSimpleName())) {
             return false;
         }
 
