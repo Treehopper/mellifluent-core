@@ -1,2 +1,7 @@
 tasks:
   - init: mvn compile generate-sources
+
+vscode:
+  extensions:
+    - redhat.java@0.76.0
+    - vscjava.vscode-java-test@0.28.1:56ae6da859db06ff02cc83b4dc77f5f4
