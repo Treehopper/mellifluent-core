@@ -40,6 +40,28 @@ import spoon.support.compiler.SpoonProgress;
 
 public abstract class AbstractFluentGenerator<T extends Class> {
 
+    private final class SpoonDebugProgress implements SpoonProgress {
+        private final Consumer<CharSequence> progressListener;
+
+        private SpoonDebugProgress(Consumer<CharSequence> progressListener) {
+            this.progressListener = progressListener;
+        }
+
+        @Override
+        public void start(Process process) { }
+
+        @Override
+        public void step(Process process, String task, int taskId, int nbTask) {
+            progressListener.accept(process + ": " + task);
+        }
+
+        @Override
+        public void step(Process process, String task) { }
+
+        @Override
+        public void end(Process process) { }
+    }
+
     public static final String GENERATED_BY = "GENERATED_BY";
 
     protected Launcher parsingLauncher;
@@ -52,6 +74,12 @@ public abstract class AbstractFluentGenerator<T extends Class> {
     private Consumer<CharSequence> progressListener;
 
     public void setup(Path root, ClassLoader classLoader, List<String> classPath, Consumer<CharSequence> progressListener) {
+        if (progressListener == null) {
+            progressListener = (chars) -> {
+                // null progress listener
+            };
+        }
+        this.progressListener = progressListener;
         parsingLauncher = new Launcher();
 
         parsingLauncher.getModelBuilder().addInputSource(root.toFile());
@@ -62,25 +90,8 @@ public abstract class AbstractFluentGenerator<T extends Class> {
         if (classPath != null) {
             parsingLauncher.getEnvironment().setSourceClasspath(classPath.toArray(new String[classPath.size()]));
         }
-
-        if (progressListener != null) {
-            parsingLauncher.getEnvironment().setSpoonProgress(new SpoonProgress() {
-
-                @Override
-                public void start(Process process) { }
-
-                @Override
-                public void step(Process process, String task, int taskId, int nbTask) {
-                    progressListener.accept(process + ": " + task);
-                }
-
-                @Override
-                public void step(Process process, String task) { }
-
-                @Override
-                public void end(Process process) { }
-            });
-        }
+        
+        parsingLauncher.getEnvironment().setSpoonProgress(new SpoonDebugProgress(progressListener));
 
         parsingLauncher.buildModel();
 
@@ -89,6 +100,11 @@ public abstract class AbstractFluentGenerator<T extends Class> {
     }
 
     public void setup(List<File> jarFiles, Consumer<CharSequence> progressListener) {
+        if (progressListener == null) {
+            progressListener = (chars) -> {
+                // null progress listener
+            };
+        }
         this.progressListener = progressListener;
         parsingLauncher = new Launcher();
 
@@ -102,24 +118,7 @@ public abstract class AbstractFluentGenerator<T extends Class> {
         parsingLauncher.getEnvironment().setNoClasspath(true);
 //        parsingLauncher.getEnvironment().setShouldCompile(false);
 
-        if (progressListener != null) {
-            parsingLauncher.getEnvironment().setSpoonProgress(new SpoonProgress() {
-
-                @Override
-                public void start(Process process) { }
-
-                @Override
-                public void step(Process process, String task, int taskId, int nbTask) {
-                    progressListener.accept(process + ": " + task);
-                }
-
-                @Override
-                public void step(Process process, String task) { }
-
-                @Override
-                public void end(Process process) { }
-            });
-        }
+        parsingLauncher.getEnvironment().setSpoonProgress(new SpoonDebugProgress(progressListener));
 
         parsingLauncher.buildModel();
 
@@ -156,12 +155,7 @@ public abstract class AbstractFluentGenerator<T extends Class> {
 
     public final List<CtClass<?>> generate(String packageName, boolean includeInheritedMethods) {
         typeFactory = new Launcher().getFactory();
-        if (progressListener == null) {
-            progressListener = (chars) -> {
-                // null progress listener
-            };
-        }
-        
+
         progressListener.accept("Writing to package: " + packageName);
         preRewrite(packageName);
         Filter<CtType<?>> classFilter = createFilter(packageName, progressListener);
