@@ -74,7 +74,7 @@ final class FilterForRegularClasses<T> implements Filter<CtType<?>> {
             return false;
         }
         
-        Set<CtMethod<?>> methods = element.getMethods();
+        Set<CtMethod<?>> methods = element.getAllMethods();
         if (methods.isEmpty()) {
             return false;
         }
