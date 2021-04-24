@@ -20,6 +20,7 @@
 package eu.hohenegger.mellifluent.generator;
 
 import java.util.Set;
+import java.util.function.Consumer;
 
 import eu.hohenegger.mellifluent.generator.model.Util;
 import spoon.reflect.declaration.CtMethod;
@@ -30,9 +31,11 @@ import spoon.reflect.visitor.Filter;
 final class FilterForInterfacesWithTwoADefaultMethod<T> implements Filter<CtType<?>> {
 
     private final String packageName;
+    private Consumer<CharSequence> progressListener;
 
-    FilterForInterfacesWithTwoADefaultMethod(String packageName) {
+    FilterForInterfacesWithTwoADefaultMethod(String packageName, Consumer<CharSequence> progressListener) {
         this.packageName = packageName;
+        this.progressListener = progressListener;
     }
 
     @Override
@@ -50,6 +53,7 @@ final class FilterForInterfacesWithTwoADefaultMethod<T> implements Filter<CtType
             return false;
         }
         if (!element.isInterface()) {
+            progressListener.accept("Not an interface: " + element.getSimpleName());
             return false;
         }
         if (element.getMethods().size() < 2) {
@@ -57,6 +61,7 @@ final class FilterForInterfacesWithTwoADefaultMethod<T> implements Filter<CtType
         }
         Set<CtMethod<?>> defaultMethods = Util.findDefaultMethods(element);
         if (defaultMethods.size() != 1) {
+            progressListener.accept("No default methods found: " + element.getSimpleName());
             return false;
         }
 

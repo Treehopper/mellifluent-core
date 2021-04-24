@@ -19,9 +19,9 @@
  */
 package eu.hohenegger.mellifluent.generator;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtModifiable;
@@ -32,9 +32,11 @@ import spoon.reflect.visitor.Filter;
 final class FilterForRegularClasses<T> implements Filter<CtType<?>> {
     private final String packageName;
     private List<String> excludes;
+    private Consumer<CharSequence> progressListener;
 
-    FilterForRegularClasses(String packageName) {
-        this(packageName, Collections.emptyList());
+    FilterForRegularClasses(String packageName, List<String> excludes, Consumer<CharSequence> progressListener) {
+        this(packageName, excludes);
+        this.progressListener = progressListener;
     }
 
     FilterForRegularClasses(String packageName, List<String> excludes) {
@@ -64,6 +66,7 @@ final class FilterForRegularClasses<T> implements Filter<CtType<?>> {
         }
 
         if (excludes.contains(element.getSimpleName())) {
+            progressListener.accept("Matched exclusion filter: " + element.getSimpleName());
             return false;
         }
 
@@ -71,11 +74,13 @@ final class FilterForRegularClasses<T> implements Filter<CtType<?>> {
         if (!constructors.isEmpty() && constructors.stream()
                 .filter(CtModifiable::isPublic)
                 .findAny().isEmpty()) {
+            progressListener.accept("No buildable constructor found for: " + element.getSimpleName());
             return false;
         }
         
         Set<CtMethod<?>> methods = element.getAllMethods();
         if (methods.isEmpty()) {
+            progressListener.accept("No methods found in: " + element.getSimpleName());
             return false;
         }
         if (methods.stream()
@@ -83,6 +88,7 @@ final class FilterForRegularClasses<T> implements Filter<CtType<?>> {
                 .map(CtMethod::getSimpleName)
                 .filter(name -> name.startsWith("set"))
                 .findAny().isEmpty()) {
+            progressListener.accept("No setters with single argument found: " + element.getSimpleName());
             return false;
         }
         if (methods.size() < 1) {

@@ -19,10 +19,9 @@
  */
 package eu.hohenegger.mellifluent.generator;
 
-import static java.util.stream.Collectors.toList;
-
 import java.io.File;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -138,12 +137,18 @@ public abstract class AbstractFluentGenerator<T extends Class> {
     abstract protected void postRewrite();
 
     private List<CtClass<?>> rewrite(List<CtType<T>> buildables, boolean includeInheritedMethods) {
-        return buildables.stream()
-                .map(classes -> rewriteClass(classes, includeInheritedMethods))
-                .collect(toList());
+        List<CtClass<?>> result = new ArrayList<>();
+        buildables.forEach(buildable -> {
+            try {
+                result.add(rewriteClass(buildable, includeInheritedMethods));
+            } catch (Exception e) {
+                throw new RuntimeException("Error while rewriting: " + buildable.getSimpleName(), e);
+            }
+        });
+        return result;
     }
 
-    abstract protected Filter<CtType<?>> createFilter(String packageName);
+    abstract protected Filter<CtType<?>> createFilter(String packageName, Consumer<CharSequence> progressListener);
 
     public final List<CtClass<?>> generate(String packageName) {
         return generate(packageName, false);
@@ -151,22 +156,22 @@ public abstract class AbstractFluentGenerator<T extends Class> {
 
     public final List<CtClass<?>> generate(String packageName, boolean includeInheritedMethods) {
         typeFactory = new Launcher().getFactory();
-        if (progressListener != null) {
-            progressListener.accept("Writing to package: " + packageName);
+        if (progressListener == null) {
+            progressListener = (chars) -> {
+                // null progress listener
+            };
         }
+        
+        progressListener.accept("Writing to package: " + packageName);
         preRewrite(packageName);
-        Filter<CtType<?>> classFilter = createFilter(packageName);
+        Filter<CtType<?>> classFilter = createFilter(packageName, progressListener);
         List<CtType<T>> buildables = Util.findClasses(classFilter, parsingLauncher.getModel());
         if (buildables.isEmpty()) {
             throw new IllegalArgumentException("No buildable classes found in " + packageName);
         }
-        if (progressListener != null) {
-            progressListener.accept("Found buildable classes: " + buildables.stream().map(CtType::getSimpleName).collect(Collectors.joining(",")));
-        }
+        progressListener.accept("Found buildable classes: " + buildables.stream().map(CtType::getSimpleName).collect(Collectors.joining(",")));
         List<CtClass<?>> result = rewrite(buildables, includeInheritedMethods);
-        if (progressListener != null) {
-            progressListener.accept("Writing: " + result.stream().map(CtType::getSimpleName).collect(Collectors.joining(",")));
-        }
+        progressListener.accept("Writing: " + result.stream().map(CtType::getSimpleName).collect(Collectors.joining(",")));
 
         postRewrite();
         return result;

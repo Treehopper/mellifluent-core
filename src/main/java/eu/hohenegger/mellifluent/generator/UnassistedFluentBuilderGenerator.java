@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import javax.inject.Named;
 
@@ -241,8 +242,8 @@ public class UnassistedFluentBuilderGenerator<T extends Class> extends AbstractF
     }
 
     @Override
-    protected Filter<CtType<?>> createFilter(String packageName) {
-        return new FilterForRegularClasses<T>(packageName, excludes);
+    protected Filter<CtType<?>> createFilter(String packageName, Consumer<CharSequence> progressListener) {
+        return new FilterForRegularClasses<T>(packageName, excludes, progressListener);
     }
 
     @Override
