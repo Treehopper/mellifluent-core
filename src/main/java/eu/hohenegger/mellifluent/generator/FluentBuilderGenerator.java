@@ -20,6 +20,7 @@
 package eu.hohenegger.mellifluent.generator;
 
 import java.util.Set;
+import java.util.function.Consumer;
 
 import javax.inject.Named;
 
@@ -124,8 +125,8 @@ public class FluentBuilderGenerator<T extends Class> extends AbstractFluentGener
     }
 
     @Override
-    protected Filter<CtType<?>> createFilter(String packageName) {
-        return new FilterForInterfacesWithTwoADefaultMethod<T>(packageName);
+    protected Filter<CtType<?>> createFilter(String packageName, Consumer<CharSequence> progressListener) {
+        return new FilterForInterfacesWithTwoADefaultMethod<T>(packageName, progressListener);
     }
 
     @Override

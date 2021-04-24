@@ -19,10 +19,9 @@
  */
 package eu.hohenegger.mellifluent.generator;
 
-import static java.util.stream.Collectors.toList;
-
 import java.io.File;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -41,6 +40,28 @@ import spoon.support.compiler.SpoonProgress;
 
 public abstract class AbstractFluentGenerator<T extends Class> {
 
+    private final class SpoonDebugProgress implements SpoonProgress {
+        private final Consumer<CharSequence> progressListener;
+
+        private SpoonDebugProgress(Consumer<CharSequence> progressListener) {
+            this.progressListener = progressListener;
+        }
+
+        @Override
+        public void start(Process process) { }
+
+        @Override
+        public void step(Process process, String task, int taskId, int nbTask) {
+            progressListener.accept(process + ": " + task);
+        }
+
+        @Override
+        public void step(Process process, String task) { }
+
+        @Override
+        public void end(Process process) { }
+    }
+
     public static final String GENERATED_BY = "GENERATED_BY";
 
     protected Launcher parsingLauncher;
@@ -53,6 +74,12 @@ public abstract class AbstractFluentGenerator<T extends Class> {
     private Consumer<CharSequence> progressListener;
 
     public void setup(Path root, ClassLoader classLoader, List<String> classPath, Consumer<CharSequence> progressListener) {
+        if (progressListener == null) {
+            progressListener = (chars) -> {
+                // null progress listener
+            };
+        }
+        this.progressListener = progressListener;
         parsingLauncher = new Launcher();
 
         parsingLauncher.getModelBuilder().addInputSource(root.toFile());
@@ -63,25 +90,8 @@ public abstract class AbstractFluentGenerator<T extends Class> {
         if (classPath != null) {
             parsingLauncher.getEnvironment().setSourceClasspath(classPath.toArray(new String[classPath.size()]));
         }
-
-        if (progressListener != null) {
-            parsingLauncher.getEnvironment().setSpoonProgress(new SpoonProgress() {
-
-                @Override
-                public void start(Process process) { }
-
-                @Override
-                public void step(Process process, String task, int taskId, int nbTask) {
-                    progressListener.accept(process + ": " + task);
-                }
-
-                @Override
-                public void step(Process process, String task) { }
-
-                @Override
-                public void end(Process process) { }
-            });
-        }
+        
+        parsingLauncher.getEnvironment().setSpoonProgress(new SpoonDebugProgress(progressListener));
 
         parsingLauncher.buildModel();
 
@@ -90,6 +100,11 @@ public abstract class AbstractFluentGenerator<T extends Class> {
     }
 
     public void setup(List<File> jarFiles, Consumer<CharSequence> progressListener) {
+        if (progressListener == null) {
+            progressListener = (chars) -> {
+                // null progress listener
+            };
+        }
         this.progressListener = progressListener;
         parsingLauncher = new Launcher();
 
@@ -103,24 +118,7 @@ public abstract class AbstractFluentGenerator<T extends Class> {
         parsingLauncher.getEnvironment().setNoClasspath(true);
 //        parsingLauncher.getEnvironment().setShouldCompile(false);
 
-        if (progressListener != null) {
-            parsingLauncher.getEnvironment().setSpoonProgress(new SpoonProgress() {
-
-                @Override
-                public void start(Process process) { }
-
-                @Override
-                public void step(Process process, String task, int taskId, int nbTask) {
-                    progressListener.accept(process + ": " + task);
-                }
-
-                @Override
-                public void step(Process process, String task) { }
-
-                @Override
-                public void end(Process process) { }
-            });
-        }
+        parsingLauncher.getEnvironment().setSpoonProgress(new SpoonDebugProgress(progressListener));
 
         parsingLauncher.buildModel();
 
@@ -138,12 +136,18 @@ public abstract class AbstractFluentGenerator<T extends Class> {
     abstract protected void postRewrite();
 
     private List<CtClass<?>> rewrite(List<CtType<T>> buildables, boolean includeInheritedMethods) {
-        return buildables.stream()
-                .map(classes -> rewriteClass(classes, includeInheritedMethods))
-                .collect(toList());
+        List<CtClass<?>> result = new ArrayList<>();
+        buildables.forEach(buildable -> {
+            try {
+                result.add(rewriteClass(buildable, includeInheritedMethods));
+            } catch (Exception e) {
+                throw new RuntimeException("Error while rewriting: " + buildable.getSimpleName(), e);
+            }
+        });
+        return result;
     }
 
-    abstract protected Filter<CtType<?>> createFilter(String packageName);
+    abstract protected Filter<CtType<?>> createFilter(String packageName, Consumer<CharSequence> progressListener);
 
     public final List<CtClass<?>> generate(String packageName) {
         return generate(packageName, false);
@@ -151,22 +155,17 @@ public abstract class AbstractFluentGenerator<T extends Class> {
 
     public final List<CtClass<?>> generate(String packageName, boolean includeInheritedMethods) {
         typeFactory = new Launcher().getFactory();
-        if (progressListener != null) {
-            progressListener.accept("Writing to package: " + packageName);
-        }
+
+        progressListener.accept("Writing to package: " + packageName);
         preRewrite(packageName);
-        Filter<CtType<?>> classFilter = createFilter(packageName);
+        Filter<CtType<?>> classFilter = createFilter(packageName, progressListener);
         List<CtType<T>> buildables = Util.findClasses(classFilter, parsingLauncher.getModel());
         if (buildables.isEmpty()) {
             throw new IllegalArgumentException("No buildable classes found in " + packageName);
         }
-        if (progressListener != null) {
-            progressListener.accept("Found buildable classes: " + buildables.stream().map(CtType::getSimpleName).collect(Collectors.joining(",")));
-        }
+        progressListener.accept("Found buildable classes: " + buildables.stream().map(CtType::getSimpleName).collect(Collectors.joining(",")));
         List<CtClass<?>> result = rewrite(buildables, includeInheritedMethods);
-        if (progressListener != null) {
-            progressListener.accept("Writing: " + result.stream().map(CtType::getSimpleName).collect(Collectors.joining(",")));
-        }
+        progressListener.accept("Writing: " + result.stream().map(CtType::getSimpleName).collect(Collectors.joining(",")));
 
         postRewrite();
         return result;
