@@ -16,7 +16,7 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mellifluent.spoon.version>1.3.0</mellifluent.spoon.version>
-        <spoon.version>7.6.0</spoon.version>
+        <spoon.version>8.2.0</spoon.version>
     </properties>
 
     <licenses>
@@ -149,7 +149,7 @@
                     <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
                     <licenseName>apache_v2</licenseName>
                     <organizationName>hohenegger.eu</organizationName>
-                    <copyrightOwners>Max Hohenegger &lt;mellifluent@hohenegger.eu&gt;</copyrightOwners>
+                    <copyrightOwners>Max Hohenegger &lt;mellifluent@hohenegger.eu></copyrightOwners>
                     <inceptionYear>2021</inceptionYear>
                 </configuration>
                 <executions>
