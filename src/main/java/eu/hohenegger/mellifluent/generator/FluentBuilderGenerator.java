@@ -40,6 +40,7 @@ import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtPackage;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.declaration.ModifierKind;
+import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.Filter;
 
 @Named("FluentBuilderGenerator")
@@ -64,12 +65,12 @@ public class FluentBuilderGenerator<T extends Class> extends AbstractFluentGener
 
         CtMethod<?> selfOverrideMethod = new FIGenerateSelfOverrideMethodBuilder()
                 .withTypeFactory(typeFactory)
-                .withBuilderReference(builderClass.getReference())
+                .withBuilderReference((CtTypeReference<Object>) builderClass.getReference())
                 .build();
         builderClass.addMethod(selfOverrideMethod);
 
         FIBuilderBuilder builderBuilder = new FIBuilderBuilder()
-                .withBuilderClass(builderClass)
+                .withBuilderClass((CtType<Object>) builderClass)
                 .withSelfOverrideMethod(selfOverrideMethod);
 
         Set<CtMethod<?>> methods = buildable.getMethods();
@@ -92,7 +93,7 @@ public class FluentBuilderGenerator<T extends Class> extends AbstractFluentGener
             CtMethod<Object> withPropertyMethod = new FIWithPropertyMethodBuilder()
                     .withTypeFactory(typeFactory)
                     .withFieldWrite(fieldWrite)
-                    .withBuilder(builderClass)
+                    .withBuilder((CtType<Object>) builderClass)
                     .withPropertyName(Util.extractPropertyName(method))
                     .withPropertyField(propertyField)
                     .withAbstractBuilder(abstractBuilder)

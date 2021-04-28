@@ -89,11 +89,11 @@ public class UnassistedFluentBuilderGenerator<T extends Class> extends AbstractF
 
         CtMethod<?> selfOverrideMethod = new FIGenerateSelfOverrideMethodBuilder()
                 .withTypeFactory(typeFactory)
-                .withBuilderReference(builderClass.getReference())
+                .withBuilderReference((CtTypeReference<Object>) builderClass.getReference())
                 .build();
         builderClass.addMethod(selfOverrideMethod);
         
-        FIBuilderBuilder builderBuilder = new FIBuilderBuilder().withBuilderClass(builderClass);
+        FIBuilderBuilder builderBuilder = new FIBuilderBuilder().withBuilderClass((CtType<Object>) builderClass);
         List<CtMethod<?>> constructors = buildable.getMethodsByName(buildable.getSimpleName());
         for (CtMethod<?> constructor : constructors) {
             List<CtParameter<?>> parameters = constructor.getParameters();
@@ -144,7 +144,7 @@ public class UnassistedFluentBuilderGenerator<T extends Class> extends AbstractF
             CtMethod<Object> withPropertyMethod = new FIWithPropertyMethodBuilder()
                     .withTypeFactory(typeFactory)
                     .withFieldWrite(fieldWrite)
-                    .withBuilder(builderClass)
+                    .withBuilder((CtType<Object>) builderClass)
                     .withPropertyName(Util.extractPropertyName(method))
                     .withPropertyField(propertyField)
                     .withAbstractBuilder(abstractBuilder)
