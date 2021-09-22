@@ -1,11 +1,11 @@
 {
     "java.configuration.updateBuildConfiguration": "interactive",
-    "java.home": "/home/gitpod/.sdkman/candidates/java/11.0.10.fx-zulu/",
+    "java.home": "/home/gitpod/.sdkman/candidates/java/current",
     "java.configuration.runtimes": [
         {
           "default": true,
           "name": "JavaSE-11",
-          "path": "/home/gitpod/.sdkman/candidates/java/11.0.10.fx-zulu/"
+          "path": "/home/gitpod/.sdkman/candidates/java/current"
         }
     ]
 }
