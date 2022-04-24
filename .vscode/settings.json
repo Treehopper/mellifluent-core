@@ -1,6 +1,6 @@
 {
     "java.configuration.updateBuildConfiguration": "interactive",
-    "java.home": "/home/gitpod/.sdkman/candidates/java/current",
+    "java.jdt.ls.java.home": "/home/gitpod/.sdkman/candidates/java/current",
     "java.configuration.runtimes": [
         {
           "default": true,
