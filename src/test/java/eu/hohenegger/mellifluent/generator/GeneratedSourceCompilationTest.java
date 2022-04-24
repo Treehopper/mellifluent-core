@@ -2,7 +2,7 @@
  * #%L
  * mellifluent-core
  * %%
- * Copyright (C) 2020 - 2021 Max Hohenegger <mellifluent@hohenegger.eu>
+ * Copyright (C) 2020 - 2022 Max Hohenegger <mellifluent@hohenegger.eu>
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ package eu.hohenegger.mellifluent.generator;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.TestInstance;
@@ -30,17 +29,15 @@ import org.junit.jupiter.api.TestInstance;
 @DisplayName("Generated Assisted Source Compilation Test")
 public class GeneratedSourceCompilationTest extends AbstractSourceCompilationTest {
 
-    @BeforeAll
-    protected void setUpAll() {
-        generator = new FluentBuilderGenerator<>();
+  @BeforeAll
+  protected void setUpAll() {
+    generator = new FluentBuilderGenerator<>();
 
-        String SRC_PACKAGE_FOLDER_NAME = "eu/hohenegger/mellifluent/generator/model";
-        sourcePackageName = SRC_PACKAGE_FOLDER_NAME.replace('/', '.');
-        targetPackageName = TARGET_PACKAGE_FOLDER_NAME.replace('/', '.');
+    String SRC_PACKAGE_FOLDER_NAME = "eu/hohenegger/mellifluent/generator/model";
+    sourcePackageName = SRC_PACKAGE_FOLDER_NAME.replace('/', '.');
+    targetPackageName = TARGET_PACKAGE_FOLDER_NAME.replace('/', '.');
 
-        Path folder = Paths.get("src/test/java")
-                .resolve(SRC_PACKAGE_FOLDER_NAME);
-        generator.setup(folder, getClass().getClassLoader(), null, null);
-    }
-
+    Path folder = Paths.get("src/test/java").resolve(SRC_PACKAGE_FOLDER_NAME);
+    generator.setup(folder, getClass().getClassLoader(), null, null);
+  }
 }

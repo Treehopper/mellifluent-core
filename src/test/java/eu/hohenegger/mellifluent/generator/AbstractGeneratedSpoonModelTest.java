@@ -2,7 +2,7 @@
  * #%L
  * mellifluent-core
  * %%
- * Copyright (C) 2020 - 2021 Max Hohenegger <mellifluent@hohenegger.eu>
+ * Copyright (C) 2020 - 2022 Max Hohenegger <mellifluent@hohenegger.eu>
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,10 @@ import static spoon.reflect.declaration.ModifierKind.PUBLIC;
 
 import java.util.List;
 import java.util.stream.Stream;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtPackage;
@@ -38,51 +36,55 @@ import spoon.reflect.declaration.CtType;
 
 public abstract class AbstractGeneratedSpoonModelTest {
 
-    protected static List<CtClass<?>> generated;
-    protected static String sourcePackageName;
+  protected static List<CtClass<?>> generated;
+  protected static String sourcePackageName;
 
-    public AbstractFluentGenerator<Class<?>> generator;
+  public AbstractFluentGenerator<Class<?>> generator;
 
-    protected Stream<CtClass<?>> ctTypes() {
-        return generated.stream();
-    }
+  protected Stream<CtClass<?>> ctTypes() {
+    return generated.stream();
+  }
 
-    @DisplayName("Verify model for")
-    @MethodSource("ctTypes")
-    @ParameterizedTest(name = "{displayName}: {arguments}")
-    public void testClasses(CtType<Object> ctType) throws Throwable {
-        List<CtMethod<?>> withMethods = ctType.getMethods()
-                .stream()
-                .filter(method -> method.getSimpleName()
-                        .startsWith("with"))
-                .collect(toList());
-        assertThat(withMethods).isNotEmpty();
-        assertThat(withMethods).allSatisfy(method -> {
-            assertThat(method.getVisibility()).isEqualTo(PUBLIC);
-            assertThat(method.getType()).isEqualTo(ctType.getReference());
-        });
+  @DisplayName("Verify model for")
+  @MethodSource("ctTypes")
+  @ParameterizedTest(name = "{displayName}: {arguments}")
+  public void testClasses(CtType<Object> ctType) throws Throwable {
+    List<CtMethod<?>> withMethods =
+        ctType.getMethods().stream()
+            .filter(method -> method.getSimpleName().startsWith("with"))
+            .collect(toList());
+    assertThat(withMethods).isNotEmpty();
+    assertThat(withMethods)
+        .allSatisfy(
+            method -> {
+              assertThat(method.getVisibility()).isEqualTo(PUBLIC);
+              assertThat(method.getType()).isEqualTo(ctType.getReference());
+            });
 
-        List<CtMethod<?>> selfMethods = ctType.getMethodsByName("self");
-        assertThat(selfMethods).hasSize(1);
-        assertThat(selfMethods).allSatisfy(method -> {
-            assertThat(method.getAnnotation(Override.class)).isNotNull();
-            assertThat(method.getType()).isEqualTo(ctType.getReference());
-        });
+    List<CtMethod<?>> selfMethods = ctType.getMethodsByName("self");
+    assertThat(selfMethods).hasSize(1);
+    assertThat(selfMethods)
+        .allSatisfy(
+            method -> {
+              assertThat(method.getAnnotation(Override.class)).isNotNull();
+              assertThat(method.getType()).isEqualTo(ctType.getReference());
+            });
 
-        List<CtMethod<?>> buildMethods = ctType.getMethodsByName("build");
-        assertThat(buildMethods).isNotEmpty();
-        assertThat(buildMethods).allSatisfy(method -> {
-            assertThat(method.getParameters()).isEmpty();
-        });
-    }
+    List<CtMethod<?>> buildMethods = ctType.getMethodsByName("build");
+    assertThat(buildMethods).isNotEmpty();
+    assertThat(buildMethods)
+        .allSatisfy(
+            method -> {
+              assertThat(method.getParameters()).isEmpty();
+            });
+  }
 
-    @Test
-    @DisplayName("Verify expected package name")
-    public void testAll() throws Throwable {
-        assertThat(generated).isNotEmpty();
-        CtPackage generatedPackage = generator.getGeneratedPackage();
-        assertThat(generatedPackage.getSimpleName()).isEqualTo("unnamed package");
-        assertThat(generatedPackage.getPackage(sourcePackageName)).isNotNull();
-    }
-
+  @Test
+  @DisplayName("Verify expected package name")
+  public void testAll() throws Throwable {
+    assertThat(generated).isNotEmpty();
+    CtPackage generatedPackage = generator.getGeneratedPackage();
+    assertThat(generatedPackage.getSimpleName()).isEqualTo("unnamed package");
+    assertThat(generatedPackage.getPackage(sourcePackageName)).isNotNull();
+  }
 }

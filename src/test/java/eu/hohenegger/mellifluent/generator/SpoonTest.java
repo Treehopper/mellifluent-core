@@ -2,7 +2,7 @@
  * #%L
  * mellifluent-core
  * %%
- * Copyright (C) 2021 - 2021 Max Hohenegger <mellifluent@hohenegger.eu>
+ * Copyright (C) 2020 - 2022 Max Hohenegger <mellifluent@hohenegger.eu>
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,11 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static spoon.support.compiler.SpoonProgress.Process.MODEL;
 
+import eu.hohenegger.mellifluent.generator.model.generics.ClassLevelGenerics;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,8 +37,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import eu.hohenegger.mellifluent.generator.model.generics.ClassLevelGenerics;
 import spoon.Launcher;
 import spoon.compiler.Environment;
 import spoon.reflect.CtModel;
@@ -50,95 +48,99 @@ import spoon.support.compiler.SpoonProgress;
 @ExtendWith(MockitoExtension.class)
 public class SpoonTest {
 
-    private Launcher parsingLauncher;
-    private ClassLoader classLoader;
+  private Launcher parsingLauncher;
+  private ClassLoader classLoader;
 
-    @Mock
-    private SpoonProgress progress;
+  @Mock private SpoonProgress progress;
 
-    @BeforeEach
-    public void setUp() {
-        parsingLauncher = new Launcher();
+  @BeforeEach
+  public void setUp() {
+    parsingLauncher = new Launcher();
 
-        Path root = Paths.get("src/test/java")
-                .resolve(ClassLevelGenerics.class.getPackageName()
-                .replace(".", "/"));
+    Path root =
+        Paths.get("src/test/java")
+            .resolve(ClassLevelGenerics.class.getPackageName().replace(".", "/"));
 
-        classLoader = getClass().getClassLoader();
+    classLoader = getClass().getClassLoader();
 
-        parsingLauncher.getModelBuilder().addInputSource(root.toFile());
-        Environment environment = parsingLauncher.getEnvironment();
-        environment.setCommentEnabled(false);
-        environment.setNoClasspath(false);
-        environment.setInputClassLoader(classLoader);
-        environment.setSpoonProgress(progress);
-    }
+    parsingLauncher.getModelBuilder().addInputSource(root.toFile());
+    Environment environment = parsingLauncher.getEnvironment();
+    environment.setCommentEnabled(false);
+    environment.setNoClasspath(false);
+    environment.setInputClassLoader(classLoader);
+    environment.setSpoonProgress(progress);
+  }
 
-    @Test
-    public void testProcessing() throws Throwable {
-        parsingLauncher.buildModel();
+  @Test
+  public void testProcessing() throws Throwable {
+    parsingLauncher.buildModel();
 
-        verify(progress, atLeastOnce()).start(eq(MODEL));
-        verify(progress, atLeastOnce()).end(eq(MODEL));
-    }
+    verify(progress, atLeastOnce()).start(eq(MODEL));
+    verify(progress, atLeastOnce()).end(eq(MODEL));
+  }
 
-    @Test
-    public void testBuildModel() throws Throwable {
-        parsingLauncher.buildModel();
+  @Test
+  public void testBuildModel() throws Throwable {
+    parsingLauncher.buildModel();
 
-        CtModel model = parsingLauncher.getModel();
-        List<CtUnnamedModule> modules = model.filterChildren(CtUnnamedModule.class::isInstance).list();
-        assertThat(modules).isNotNull();
-        assertThat(modules).isNotEmpty();
-        assertThat(modules).allSatisfy(element -> {
-            assertThat(element).isInstanceOfAny(CtUnnamedModule.class);
-        });
+    CtModel model = parsingLauncher.getModel();
+    List<CtUnnamedModule> modules = model.filterChildren(CtUnnamedModule.class::isInstance).list();
+    assertThat(modules).isNotNull();
+    assertThat(modules).isNotEmpty();
+    assertThat(modules)
+        .allSatisfy(
+            element -> {
+              assertThat(element).isInstanceOfAny(CtUnnamedModule.class);
+            });
 
-        List<CtPackage> packages = model.filterChildren(CtPackage.class::isInstance).list();
-        assertThat(packages).isNotNull();
-        assertThat(packages).isNotEmpty();
-        assertThat(packages).allSatisfy(element -> {
-            assertThat(element).isInstanceOfAny(CtPackage.class);
-        });
-    }
+    List<CtPackage> packages = model.filterChildren(CtPackage.class::isInstance).list();
+    assertThat(packages).isNotNull();
+    assertThat(packages).isNotEmpty();
+    assertThat(packages)
+        .allSatisfy(
+            element -> {
+              assertThat(element).isInstanceOfAny(CtPackage.class);
+            });
+  }
 
-    @Test
-    public void testClasses() throws Throwable {
-        parsingLauncher.buildModel();
+  @Test
+  public void testClasses() throws Throwable {
+    parsingLauncher.buildModel();
 
-        CtModel model = parsingLauncher.getModel();
-        List<CtClass<?>> classes = model.filterChildren(CtClass.class::isInstance).list();
-        assertThat(classes).isNotNull();
-        assertThat(classes).isNotEmpty();
-        assertThat(classes).allSatisfy(clazz -> {
-            assertThat(clazz).isInstanceOfAny(CtClass.class);
-        });
-    }
+    CtModel model = parsingLauncher.getModel();
+    List<CtClass<?>> classes = model.filterChildren(CtClass.class::isInstance).list();
+    assertThat(classes).isNotNull();
+    assertThat(classes).isNotEmpty();
+    assertThat(classes)
+        .allSatisfy(
+            clazz -> {
+              assertThat(clazz).isInstanceOfAny(CtClass.class);
+            });
+  }
 
-    @Test
-    @DisplayName("Package hierarchy behavior with Spoon 7.5.0")
-    public void testCopyModel(@TempDir Path tempDir) throws Throwable {
-        parsingLauncher.buildModel();
+  @Test
+  @DisplayName("Package hierarchy behavior with Spoon 7.5.0")
+  public void testCopyModel(@TempDir Path tempDir) throws Throwable {
+    parsingLauncher.buildModel();
 
-        CtModel model = parsingLauncher.getModel();
-        List<CtClass<?>> classes = model.filterChildren(CtClass.class::isInstance).list();
+    CtModel model = parsingLauncher.getModel();
+    List<CtClass<?>> classes = model.filterChildren(CtClass.class::isInstance).list();
 
-        FileWriter writer = new FileWriter(classes, "foobar", tempDir.toFile(), true);
-        writer.persist();
-        assertThat(Files.list(tempDir.resolve("foobar"))).isNotEmpty();
-    }
-    
-    @Test
-    @DisplayName("Package hierarchy behavior with Spoon 7.6.x")
-    public void testCopyModelNestedPackage(@TempDir Path tempDir) throws Throwable {
-        parsingLauncher.buildModel();
+    FileWriter writer = new FileWriter(classes, "foobar", tempDir.toFile(), true);
+    writer.persist();
+    assertThat(Files.list(tempDir.resolve("foobar"))).isNotEmpty();
+  }
 
-        CtModel model = parsingLauncher.getModel();
-        List<CtClass<?>> classes = model.filterChildren(CtClass.class::isInstance).list();
+  @Test
+  @DisplayName("Package hierarchy behavior with Spoon 7.6.x")
+  public void testCopyModelNestedPackage(@TempDir Path tempDir) throws Throwable {
+    parsingLauncher.buildModel();
 
-        FileWriter writer = new FileWriter(classes, "foo.bar", tempDir.toFile(), true);
-        writer.persist();
-        assertThat(Files.list(tempDir.resolve("foo").resolve("bar"))).isNotEmpty();
-    }
+    CtModel model = parsingLauncher.getModel();
+    List<CtClass<?>> classes = model.filterChildren(CtClass.class::isInstance).list();
 
+    FileWriter writer = new FileWriter(classes, "foo.bar", tempDir.toFile(), true);
+    writer.persist();
+    assertThat(Files.list(tempDir.resolve("foo").resolve("bar"))).isNotEmpty();
+  }
 }

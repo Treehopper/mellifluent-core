@@ -2,7 +2,7 @@
  * #%L
  * mellifluent-core
  * %%
- * Copyright (C) 2020 - 2021 Max Hohenegger <mellifluent@hohenegger.eu>
+ * Copyright (C) 2020 - 2022 Max Hohenegger <mellifluent@hohenegger.eu>
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ package eu.hohenegger.mellifluent.generator;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.TestInstance;
@@ -30,18 +29,17 @@ import org.junit.jupiter.api.TestInstance;
 @DisplayName("Generated Fluent Spoon Model Test")
 public class GeneratedUnassistedSpoonModelTest extends AbstractGeneratedSpoonModelTest {
 
-    @BeforeAll
-    public void setUp() {
-        String srcPackageFolderName = "eu/hohenegger/mellifluent/generator/model/generics";
-        Path srcPath = Paths.get("src/test/java");
+  @BeforeAll
+  public void setUp() {
+    String srcPackageFolderName = "eu/hohenegger/mellifluent/generator/model/generics";
+    Path srcPath = Paths.get("src/test/java");
 
-        generator = new UnassistedFluentBuilderGenerator<>();
+    generator = new UnassistedFluentBuilderGenerator<>();
 
-        Path folder = srcPath.resolve(srcPackageFolderName);
-        generator.setup(folder, GeneratedSourceCompilationTest.class.getClassLoader(), null, null);
+    Path folder = srcPath.resolve(srcPackageFolderName);
+    generator.setup(folder, GeneratedSourceCompilationTest.class.getClassLoader(), null, null);
 
-        sourcePackageName = srcPackageFolderName.replace('/', '.');
-        generated = generator.generate(sourcePackageName);
-    }
-
+    sourcePackageName = srcPackageFolderName.replace('/', '.');
+    generated = generator.generate(sourcePackageName);
+  }
 }

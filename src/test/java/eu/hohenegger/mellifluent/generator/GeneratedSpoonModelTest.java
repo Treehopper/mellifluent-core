@@ -2,7 +2,7 @@
  * #%L
  * mellifluent-core
  * %%
- * Copyright (C) 2020 - 2021 Max Hohenegger <mellifluent@hohenegger.eu>
+ * Copyright (C) 2020 - 2022 Max Hohenegger <mellifluent@hohenegger.eu>
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,11 @@ import static spoon.reflect.declaration.ModifierKind.PUBLIC;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-
 import spoon.reflect.code.CtReturn;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtType;
@@ -42,34 +40,37 @@ import spoon.reflect.declaration.CtType;
 @DisplayName("Generated Assisted Spoon Model Test")
 public class GeneratedSpoonModelTest extends AbstractGeneratedSpoonModelTest {
 
-    @BeforeAll
-    public void setUp() {
-        String srcPackageFolderName = "eu/hohenegger/mellifluent/generator/model";
-        Path srcPath = Paths.get("src/test/java");
+  @BeforeAll
+  public void setUp() {
+    String srcPackageFolderName = "eu/hohenegger/mellifluent/generator/model";
+    Path srcPath = Paths.get("src/test/java");
 
-        generator = new FluentBuilderGenerator<>();
+    generator = new FluentBuilderGenerator<>();
 
-        Path folder = srcPath.resolve(srcPackageFolderName);
-        generator.setup(folder, GeneratedSourceCompilationTest.class.getClassLoader(), null, null);
+    Path folder = srcPath.resolve(srcPackageFolderName);
+    generator.setup(folder, GeneratedSourceCompilationTest.class.getClassLoader(), null, null);
 
-        sourcePackageName = srcPackageFolderName.replace('/', '.');
-        generated = generator.generate(sourcePackageName);
-    }
+    sourcePackageName = srcPackageFolderName.replace('/', '.');
+    generated = generator.generate(sourcePackageName);
+  }
 
-    @DisplayName("Verify Get Methods for")
-    @MethodSource("ctTypes")
-    @ParameterizedTest(name = "{displayName}: {arguments}")
-    public void testGetMethods(CtType<Object> ctType) throws Throwable {
+  @DisplayName("Verify Get Methods for")
+  @MethodSource("ctTypes")
+  @ParameterizedTest(name = "{displayName}: {arguments}")
+  public void testGetMethods(CtType<Object> ctType) throws Throwable {
 
-        List<CtMethod<?>> getMethods = ctType.getMethods().stream()
-                .filter(method -> method.getSimpleName().startsWith("get")).collect(toList());
-        assertThat(getMethods).isNotEmpty();
-        assertThat(getMethods).allSatisfy(method -> {
-            assertThat(method.getAnnotation(Override.class)).isNotNull();
-            assertThat(method.getVisibility()).isEqualTo(PUBLIC);
-            assertThat(method.getBody().getStatements()).isNotEmpty();
-            assertTrue(method.getBody().getLastStatement() instanceof CtReturn);
-        });
-    }
-
+    List<CtMethod<?>> getMethods =
+        ctType.getMethods().stream()
+            .filter(method -> method.getSimpleName().startsWith("get"))
+            .collect(toList());
+    assertThat(getMethods).isNotEmpty();
+    assertThat(getMethods)
+        .allSatisfy(
+            method -> {
+              assertThat(method.getAnnotation(Override.class)).isNotNull();
+              assertThat(method.getVisibility()).isEqualTo(PUBLIC);
+              assertThat(method.getBody().getStatements()).isNotEmpty();
+              assertTrue(method.getBody().getLastStatement() instanceof CtReturn);
+            });
+  }
 }

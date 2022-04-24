@@ -17,34 +17,3 @@
  * limitations under the License.
  * #L%
  */
-package eu.hohenegger.mellifluent.generator.model;
-
-import spoon.reflect.declaration.CtPackage;
-import spoon.reflect.factory.Factory;
-
-public class BuilderPackage {
-  private String packageName;
-  private Factory typeFactory;
-
-  public String getPackageName() {
-    return packageName;
-  }
-
-  public void setPackageName(String packageName) {
-    this.packageName = packageName;
-  }
-
-  public Factory getTypeFactory() {
-    return typeFactory;
-  }
-
-  public void setTypeFactory(Factory typeFactory) {
-    this.typeFactory = typeFactory;
-  }
-
-  public CtPackage build() {
-    CtPackage result = getTypeFactory().createPackage();
-    // TODO
-    return result;
-  }
-}

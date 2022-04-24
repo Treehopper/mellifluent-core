@@ -2,7 +2,7 @@
  * #%L
  * mellifluent-core
  * %%
- * Copyright (C) 2020 - 2021 Max Hohenegger <mellifluent@hohenegger.eu>
+ * Copyright (C) 2020 - 2022 Max Hohenegger <mellifluent@hohenegger.eu>
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,11 @@ package eu.hohenegger.mellifluent.generator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.contentOf;
 
+import eu.hohenegger.mellifluent.generator.model.imports.FileReferenceClass;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -34,62 +34,57 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import eu.hohenegger.mellifluent.generator.model.imports.FileReferenceClass;
 import spoon.reflect.declaration.CtClass;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class GeneratedUnassistedAutoImportTest {
 
-    public static final Path TARGET_PATH = Paths.get("target/generated-sources/java");
-    public static final String TARGET_SUB_PATH = "foo";
-    public static final String TARGET_PACKAGE_FOLDER_NAME = TARGET_SUB_PATH + ".bar";
+  public static final Path TARGET_PATH = Paths.get("target/generated-sources/java");
+  public static final String TARGET_SUB_PATH = "foo";
+  public static final String TARGET_PACKAGE_FOLDER_NAME = TARGET_SUB_PATH + ".bar";
 
-    public String sourcePackageName;
-    public String targetPackageName;
-    public Path folder;
+  public String sourcePackageName;
+  public String targetPackageName;
+  public Path folder;
 
-    public AbstractFluentGenerator<Class<?>> generator;
+  public AbstractFluentGenerator<Class<?>> generator;
 
+  @BeforeAll
+  protected void setUpAll() {
+    folder =
+        Paths.get("src/test/java")
+            .resolve(FileReferenceClass.class.getPackageName().replace('.', '/'));
+    sourcePackageName = FileReferenceClass.class.getPackageName();
+    targetPackageName = TARGET_PACKAGE_FOLDER_NAME.replace('/', '.');
 
-    @BeforeAll
-    protected void setUpAll() {
-        folder = Paths.get("src/test/java")
-                .resolve(FileReferenceClass.class.getPackageName()
-                        .replace('.', '/'));
-        sourcePackageName = FileReferenceClass.class.getPackageName();
-        targetPackageName = TARGET_PACKAGE_FOLDER_NAME.replace('/', '.');
+    generator = new UnassistedFluentBuilderGenerator<>();
+    generator.setup(folder, getClass().getClassLoader(), null, null);
+  }
 
-        generator = new UnassistedFluentBuilderGenerator<>();
-        generator.setup(folder, getClass().getClassLoader(), null, null);
-    }
+  @TempDir Path tempDir;
 
-    @TempDir
-    Path tempDir;
+  @ParameterizedTest(name = "{index} When autoimport = {0} then output must contain {1}")
+  @CsvSource({"true,import java.io.File", "false,private java.io.File"})
+  @DisplayName("Verify the output contains the right imports")
+  public void testFileWriter(boolean autoImport, String fileReference) throws Throwable {
+    folder =
+        Paths.get("src/test/java")
+            .resolve(FileReferenceClass.class.getPackageName().replace('.', '/'));
+    sourcePackageName = FileReferenceClass.class.getPackageName();
+    targetPackageName = TARGET_PACKAGE_FOLDER_NAME.replace('/', '.');
 
-    @ParameterizedTest(name = "{index} When autoimport = {0} then output must contain {1}")
-    @CsvSource({
-                    "true,import java.io.File",
-                    "false,private java.io.File"
-               })
-    @DisplayName("Verify the output contains the right imports")
-    public void testFileWriter(boolean autoImport, String fileReference) throws Throwable {
-        folder = Paths.get("src/test/java")
-                .resolve(FileReferenceClass.class.getPackageName()
-                        .replace('.', '/'));
-        sourcePackageName = FileReferenceClass.class.getPackageName();
-        targetPackageName = TARGET_PACKAGE_FOLDER_NAME.replace('/', '.');
+    List<CtClass<?>> list = generator.generate(sourcePackageName);
 
-        List<CtClass<?>> list = generator.generate(sourcePackageName);
+    new FileWriter(list, targetPackageName, tempDir.toFile(), autoImport).persist();
 
-        new FileWriter(list, targetPackageName, tempDir.toFile(), autoImport).persist();
-
-        Files.walk(tempDir)
-                .filter(Files::isRegularFile)
-                .map(Path::toFile)
-                .findAny()
-                .ifPresentOrElse(file -> {
-                    assertThat(contentOf(file)).contains(fileReference);
-                }, Assertions::fail);
-    }
+    Files.walk(tempDir)
+        .filter(Files::isRegularFile)
+        .map(Path::toFile)
+        .findAny()
+        .ifPresentOrElse(
+            file -> {
+              assertThat(contentOf(file)).contains(fileReference);
+            },
+            Assertions::fail);
+  }
 }

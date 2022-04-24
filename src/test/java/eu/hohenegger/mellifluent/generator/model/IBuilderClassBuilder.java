@@ -2,7 +2,7 @@
  * #%L
  * mellifluent-core
  * %%
- * Copyright (C) 2020 - 2021 Max Hohenegger <mellifluent@hohenegger.eu>
+ * Copyright (C) 2020 - 2022 Max Hohenegger <mellifluent@hohenegger.eu>
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,17 +26,19 @@ import spoon.reflect.reference.CtTypeReference;
 
 public interface IBuilderClassBuilder {
 
-    default CtClass<?> build() {
-        CtClass<?> builderClass = getTypeFactory().createClass(getBuilderName());
-        builderClass.setSuperclass(getAbstractBuilderReference());
-        builderClass.addSuperInterface(getBuildableReference());
-        builderClass.setVisibility(ModifierKind.PUBLIC);
-        return builderClass;
-    }
+  default CtClass<?> build() {
+    CtClass<?> builderClass = getTypeFactory().createClass(getBuilderName());
+    builderClass.setSuperclass(getAbstractBuilderReference());
+    builderClass.addSuperInterface(getBuildableReference());
+    builderClass.setVisibility(ModifierKind.PUBLIC);
+    return builderClass;
+  }
 
-    CtTypeReference getBuildableReference();
-    CtTypeReference getAbstractBuilderReference();
-    String getBuilderName();
+  CtTypeReference getBuildableReference();
 
-    Factory getTypeFactory();
+  CtTypeReference getAbstractBuilderReference();
+
+  String getBuilderName();
+
+  Factory getTypeFactory();
 }

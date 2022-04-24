@@ -2,7 +2,7 @@
  * #%L
  * mellifluent-core
  * %%
- * Copyright (C) 2020 - 2021 Max Hohenegger <mellifluent@hohenegger.eu>
+ * Copyright (C) 2020 - 2022 Max Hohenegger <mellifluent@hohenegger.eu>
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,18 +26,18 @@ import spoon.reflect.factory.Factory;
 
 public interface IAbstractFluentBuilder {
 
-    default CtClass<?> build() {
-        CtClass<?> result = getTypeFactory().createClass("AbstractFluentBuilder");
-        result.addModifier(ModifierKind.PUBLIC);
-        result.addModifier(ModifierKind.ABSTRACT);
-        CtMethod selfMethod = getTypeFactory().createMethod();
-        selfMethod.setSimpleName("self");
-        selfMethod.addModifier(ModifierKind.PROTECTED);
-        selfMethod.addModifier(ModifierKind.ABSTRACT);
-        selfMethod.setType(result.getReference());
-        result.addMethod(selfMethod);
-        return result;
-    }
+  default CtClass<?> build() {
+    CtClass<?> result = getTypeFactory().createClass("AbstractFluentBuilder");
+    result.addModifier(ModifierKind.PUBLIC);
+    result.addModifier(ModifierKind.ABSTRACT);
+    CtMethod selfMethod = getTypeFactory().createMethod();
+    selfMethod.setSimpleName("self");
+    selfMethod.addModifier(ModifierKind.PROTECTED);
+    selfMethod.addModifier(ModifierKind.ABSTRACT);
+    selfMethod.setType(result.getReference());
+    result.addMethod(selfMethod);
+    return result;
+  }
 
-    Factory getTypeFactory();
+  Factory getTypeFactory();
 }

@@ -2,7 +2,7 @@
  * #%L
  * mellifluent-core
  * %%
- * Copyright (C) 2021 Max Hohenegger <mellifluent@hohenegger.eu>
+ * Copyright (C) 2020 - 2022 Max Hohenegger <mellifluent@hohenegger.eu>
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,10 @@ import spoon.reflect.declaration.CtElement;
 
 public class MethodLevelGenerics {
 
-    /**
-     * This is not yet supported
-     */
-    public <T extends CtElement> T setParent(T parent) {
-        return (T) this;
-    }
+  /** This is not yet supported */
+  public <T extends CtElement> T setParent(T parent) {
+    return (T) this;
+  }
 
-    public void setString(String parent) {
-    }
+  public void setString(String parent) {}
 }

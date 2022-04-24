@@ -2,7 +2,7 @@
  * #%L
  * mellifluent-core
  * %%
- * Copyright (C) 2021 Max Hohenegger <mellifluent@hohenegger.eu>
+ * Copyright (C) 2020 - 2022 Max Hohenegger <mellifluent@hohenegger.eu>
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,12 @@
 package eu.hohenegger.mellifluent.generator.model.generics;
 
 import java.util.Set;
-
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtConstructor;
 
 public class ComplexClassLevelGenerics<T> {
 
-	public <C extends CtClass<T>> C setConstructors(Set<CtConstructor<T>> constructors) {
-		return (C) this;
-	}
+  public <C extends CtClass<T>> C setConstructors(Set<CtConstructor<T>> constructors) {
+    return (C) this;
+  }
 }

@@ -2,7 +2,7 @@
  * #%L
  * mellifluent-core
  * %%
- * Copyright (C) 2020 - 2021 Max Hohenegger <mellifluent@hohenegger.eu>
+ * Copyright (C) 2020 - 2022 Max Hohenegger <mellifluent@hohenegger.eu>
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 package eu.hohenegger.mellifluent.generator.model;
 
 import java.lang.annotation.Annotation;
-
 import spoon.reflect.code.CtBlock;
 import spoon.reflect.code.CtReturn;
 import spoon.reflect.code.CtVariableRead;
@@ -33,29 +32,30 @@ import spoon.reflect.reference.CtVariableReference;
 
 public interface IGetterBuilder {
 
-    CtField<Object> getField();
+  CtField<Object> getField();
 
-    Factory getTypeFactory();
+  Factory getTypeFactory();
 
-    CtMethod<?> getInterfaceMethod();
+  CtMethod<?> getInterfaceMethod();
 
-    default CtMethod<?> build() {
-        CtMethod<?> result = getInterfaceMethod().clone();
-        result.removeModifier(ModifierKind.ABSTRACT);
-        CtTypeReference<Annotation> overrideReference = getTypeFactory().createCtTypeReference(Override.class);
-        result.addAnnotation(getTypeFactory().createAnnotation(overrideReference));
+  default CtMethod<?> build() {
+    CtMethod<?> result = getInterfaceMethod().clone();
+    result.removeModifier(ModifierKind.ABSTRACT);
+    CtTypeReference<Annotation> overrideReference =
+        getTypeFactory().createCtTypeReference(Override.class);
+    result.addAnnotation(getTypeFactory().createAnnotation(overrideReference));
 
-        CtBlock<?> block = getTypeFactory().createBlock();
+    CtBlock<?> block = getTypeFactory().createBlock();
 
-        CtReturn<Object> methodReturn = getTypeFactory().createReturn();
-        CtVariableRead<Object> read = getTypeFactory().createVariableRead();
+    CtReturn<Object> methodReturn = getTypeFactory().createReturn();
+    CtVariableRead<Object> read = getTypeFactory().createVariableRead();
 
-        read.setVariable((CtVariableReference<Object>) getField().getReference());
-        methodReturn.setReturnedExpression(read);
-        block.addStatement(methodReturn);
+    read.setVariable((CtVariableReference<Object>) getField().getReference());
+    methodReturn.setReturnedExpression(read);
+    block.addStatement(methodReturn);
 
-        result.setBody(block);
+    result.setBody(block);
 
-        return result;
-    }
+    return result;
+  }
 }

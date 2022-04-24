@@ -2,7 +2,7 @@
  * #%L
  * mellifluent-core
  * %%
- * Copyright (C) 2021 Max Hohenegger <mellifluent@hohenegger.eu>
+ * Copyright (C) 2020 - 2022 Max Hohenegger <mellifluent@hohenegger.eu>
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ package eu.hohenegger.mellifluent.generator;
 
 import java.io.File;
 import java.util.List;
-
 import spoon.Launcher;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtPackage;
@@ -32,54 +31,60 @@ import spoon.support.reflect.declaration.CtPackageImpl;
 
 public final class FileWriter extends Launcher {
 
-    private boolean autoImports;
+  private boolean autoImports;
 
-    private final class WriterFactory extends FactoryImpl {
+  private final class WriterFactory extends FactoryImpl {
 
-        private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-        private WriterFactory() {
-            super(new DefaultCoreFactory(), createEnvironment());
-        }
+    private WriterFactory() {
+      super(new DefaultCoreFactory(), createEnvironment());
+    }
 
-        private void init(List<CtClass<?>> clazzes, String packageName, File sourceOutputDirectory) {
-            CtPackage pack = createPackageHierarchy(packageName, getModel().getRootPackage());
-            clazzes.stream().map(CtClass::clone).forEach(clazz -> {
+    private void init(List<CtClass<?>> clazzes, String packageName, File sourceOutputDirectory) {
+      CtPackage pack = createPackageHierarchy(packageName, getModel().getRootPackage());
+      clazzes.stream()
+          .map(CtClass::clone)
+          .forEach(
+              clazz -> {
                 clazz.setFactory(this);
                 pack.addType(clazz);
-            });
-            setSourceOutputDirectory(sourceOutputDirectory);
-            getEnvironment().setAutoImports(autoImports);
-            getEnvironment().setCommentEnabled(false);
-        }
-
-        private CtPackage createPackageHierarchy(String packageName, CtPackage parent) {
-            String[] segments = packageName.split("\\.");
-            CtPackage currentPackage = null;
-            for (int i = 0; i < segments.length; i++) {
-                currentPackage = new CtPackageImpl();
-                currentPackage.setSimpleName(segments[i]);
-                parent.addPackage(currentPackage);
-                parent = currentPackage;
-            }
-            return currentPackage;
-        }
+              });
+      setSourceOutputDirectory(sourceOutputDirectory);
+      getEnvironment().setAutoImports(autoImports);
+      getEnvironment().setCommentEnabled(false);
     }
 
-    public FileWriter(List<CtClass<?>> clonedClasses, String packageName, File sourceOutputDirectory, boolean autoImports) {
-        this.autoImports = autoImports;
-        WriterFactory writerFactory = (WriterFactory) getFactory();
-        writerFactory.init(clonedClasses, packageName, sourceOutputDirectory);
+    private CtPackage createPackageHierarchy(String packageName, CtPackage parent) {
+      String[] segments = packageName.split("\\.");
+      CtPackage currentPackage = null;
+      for (int i = 0; i < segments.length; i++) {
+        currentPackage = new CtPackageImpl();
+        currentPackage.setSimpleName(segments[i]);
+        parent.addPackage(currentPackage);
+        parent = currentPackage;
+      }
+      return currentPackage;
     }
+  }
 
-    @Override
-    public Factory createFactory() {
-        return new WriterFactory();
-    }
+  public FileWriter(
+      List<CtClass<?>> clonedClasses,
+      String packageName,
+      File sourceOutputDirectory,
+      boolean autoImports) {
+    this.autoImports = autoImports;
+    WriterFactory writerFactory = (WriterFactory) getFactory();
+    writerFactory.init(clonedClasses, packageName, sourceOutputDirectory);
+  }
 
-    public File persist() {
-        prettyprint();
-        return getEnvironment().getOutputDestinationHandler()
-                .getDefaultOutputDirectory();
-    }
+  @Override
+  public Factory createFactory() {
+    return new WriterFactory();
+  }
+
+  public File persist() {
+    prettyprint();
+    return getEnvironment().getOutputDestinationHandler().getDefaultOutputDirectory();
+  }
 }

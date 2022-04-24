@@ -2,7 +2,7 @@
  * #%L
  * mellifluent-core
  * %%
- * Copyright (C) 2020 - 2021 Max Hohenegger <mellifluent@hohenegger.eu>
+ * Copyright (C) 2020 - 2022 Max Hohenegger <mellifluent@hohenegger.eu>
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,6 @@
  */
 package eu.hohenegger.mellifluent.generator;
 
-import java.util.Set;
-import java.util.function.Consumer;
-
-import javax.inject.Named;
-
 import eu.hohenegger.mellifluent.generator.api.FIBuildMethodBuilder;
 import eu.hohenegger.mellifluent.generator.api.FIBuilderBuilder;
 import eu.hohenegger.mellifluent.generator.api.FIBuilderClassBuilder;
@@ -33,6 +28,9 @@ import eu.hohenegger.mellifluent.generator.api.FIGenerateSelfOverrideMethodBuild
 import eu.hohenegger.mellifluent.generator.api.FIGetterBuilder;
 import eu.hohenegger.mellifluent.generator.api.FIWithPropertyMethodBuilder;
 import eu.hohenegger.mellifluent.generator.model.Util;
+import java.util.Set;
+import java.util.function.Consumer;
+import javax.inject.Named;
 import spoon.reflect.code.CtVariableAccess;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtField;
@@ -46,92 +44,100 @@ import spoon.reflect.visitor.Filter;
 @Named("FluentBuilderGenerator")
 public class FluentBuilderGenerator<T extends Class> extends AbstractFluentGenerator<T> {
 
-    @Override
-    protected void postRewrite() {
-        model.getRootPackage().addPackage(builderPackage);
+  @Override
+  protected void postRewrite() {
+    model.getRootPackage().addPackage(builderPackage);
+  }
+
+  @Override
+  protected CtClass<?> rewriteClass(CtType<T> buildable, boolean includeInheritedMethods) {
+    String builderName = "F" + buildable.getSimpleName();
+
+    CtClass<?> builderClass =
+        new FIBuilderClassBuilder()
+            .withTypeFactory(typeFactory)
+            .withBuilderName(builderName)
+            .withAbstractBuilderReference(abstractBuilder.getReference())
+            .withBuildableReference(buildable.getReference())
+            .build();
+    builderClass.setVisibility(ModifierKind.PUBLIC);
+
+    CtMethod<?> selfOverrideMethod =
+        new FIGenerateSelfOverrideMethodBuilder()
+            .withTypeFactory(typeFactory)
+            .withBuilderReference((CtTypeReference<Object>) builderClass.getReference())
+            .build();
+    builderClass.addMethod(selfOverrideMethod);
+
+    FIBuilderBuilder builderBuilder =
+        new FIBuilderBuilder()
+            .withBuilderClass((CtType<Object>) builderClass)
+            .withSelfOverrideMethod(selfOverrideMethod);
+
+    Set<CtMethod<?>> methods = buildable.getMethods();
+    for (CtMethod<?> method : methods) {
+      if (!method.getSimpleName().startsWith("get")) {
+        continue;
+      }
+      CtField<Object> propertyField =
+          new FIFieldBuilder()
+              .withTypeFactory(typeFactory)
+              .withSimpleName(Util.extractPropertyName(method))
+              .withGetterDeclaringType(method.getType())
+              .build();
+      builderClass.addField(propertyField);
+
+      CtVariableAccess<Object> fieldWrite =
+          new FIFieldWriteBuilder()
+              .withTypeFactory(typeFactory)
+              .withFieldName(propertyField.getSimpleName())
+              .build();
+
+      CtMethod<Object> withPropertyMethod =
+          new FIWithPropertyMethodBuilder()
+              .withTypeFactory(typeFactory)
+              .withFieldWrite(fieldWrite)
+              .withBuilder((CtType<Object>) builderClass)
+              .withPropertyName(Util.extractPropertyName(method))
+              .withPropertyField(propertyField)
+              .withAbstractBuilder(abstractBuilder)
+              .build();
+
+      builderClass.addMethod(withPropertyMethod);
+
+      // override getter from interface ====================
+      CtMethod<?> overriddenGetter =
+          new FIGetterBuilder()
+              .withTypeFactory(typeFactory)
+              .withInterfaceMethod(method)
+              .withField(propertyField)
+              .build();
+      builderClass.addMethod(overriddenGetter);
     }
 
-    @Override
-    protected CtClass<?> rewriteClass(CtType<T> buildable, boolean includeInheritedMethods) {
-        String builderName = "F" + buildable.getSimpleName();
-
-        CtClass<?> builderClass = new FIBuilderClassBuilder()
-                .withTypeFactory(typeFactory)
-                .withBuilderName(builderName)
-                .withAbstractBuilderReference(abstractBuilder.getReference())
-                .withBuildableReference(buildable.getReference())
-                .build();
-        builderClass.setVisibility(ModifierKind.PUBLIC);
-
-        CtMethod<?> selfOverrideMethod = new FIGenerateSelfOverrideMethodBuilder()
-                .withTypeFactory(typeFactory)
-                .withBuilderReference((CtTypeReference<Object>) builderClass.getReference())
-                .build();
-        builderClass.addMethod(selfOverrideMethod);
-
-        FIBuilderBuilder builderBuilder = new FIBuilderBuilder()
-                .withBuilderClass((CtType<Object>) builderClass)
-                .withSelfOverrideMethod(selfOverrideMethod);
-
-        Set<CtMethod<?>> methods = buildable.getMethods();
-        for (CtMethod<?> method : methods) {
-            if (!method.getSimpleName().startsWith("get")) {
-                continue;
-            }
-            CtField<Object> propertyField = new FIFieldBuilder()
-                    .withTypeFactory(typeFactory)
-                    .withSimpleName(Util.extractPropertyName(method))
-                    .withGetterDeclaringType(method.getType())
-                    .build();
-            builderClass.addField(propertyField);
-
-            CtVariableAccess<Object> fieldWrite = new FIFieldWriteBuilder()
-                    .withTypeFactory(typeFactory)
-                    .withFieldName(propertyField.getSimpleName())
-                    .build();
-
-            CtMethod<Object> withPropertyMethod = new FIWithPropertyMethodBuilder()
-                    .withTypeFactory(typeFactory)
-                    .withFieldWrite(fieldWrite)
-                    .withBuilder((CtType<Object>) builderClass)
-                    .withPropertyName(Util.extractPropertyName(method))
-                    .withPropertyField(propertyField)
-                    .withAbstractBuilder(abstractBuilder)
-                    .build();
-
-            builderClass.addMethod(withPropertyMethod);
-
-            // override getter from interface ====================
-            CtMethod<?> overriddenGetter = new FIGetterBuilder()
-                    .withTypeFactory(typeFactory)
-                    .withInterfaceMethod(method)
-                    .withField(propertyField)
-                    .build();
-            builderClass.addMethod(overriddenGetter);
-        }
-
-        CtMethod<?> buildMethod = new FIBuildMethodBuilder().withBuildable(buildable).build();
-        builderBuilder
+    CtMethod<?> buildMethod = new FIBuildMethodBuilder().withBuildable(buildable).build();
+    builderBuilder
         .withBuildMethod(buildMethod)
         .withGeneratedByMetaData(getClass().getCanonicalName());
 
-        abstractBuilder.putMetadata(GENERATED_BY, getClass().getCanonicalName());
-        CtType<Object> build = builderBuilder.build();
-        build.setParent(builderPackage);
-        builderPackage.addType(build);
+    abstractBuilder.putMetadata(GENERATED_BY, getClass().getCanonicalName());
+    CtType<Object> build = builderBuilder.build();
+    build.setParent(builderPackage);
+    builderPackage.addType(build);
 
-        builderPackage.addType(abstractBuilder.clone());
+    builderPackage.addType(abstractBuilder.clone());
 
-        return builderClass;
-    }
+    return builderClass;
+  }
 
-    @Override
-    protected Filter<CtType<?>> createFilter(String packageName, Consumer<CharSequence> progressListener) {
-        return new FilterForInterfacesWithTwoADefaultMethod<T>(packageName, progressListener);
-    }
+  @Override
+  protected Filter<CtType<?>> createFilter(
+      String packageName, Consumer<CharSequence> progressListener) {
+    return new FilterForInterfacesWithTwoADefaultMethod<T>(packageName, progressListener);
+  }
 
-    @Override
-    CtPackage getGeneratedPackage() {
-        return model.getRootPackage().clone();
-    }
+  @Override
+  CtPackage getGeneratedPackage() {
+    return model.getRootPackage().clone();
+  }
 }

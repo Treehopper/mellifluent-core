@@ -2,7 +2,7 @@
  * #%L
  * mellifluent-core
  * %%
- * Copyright (C) 2020 - 2021 Max Hohenegger <mellifluent@hohenegger.eu>
+ * Copyright (C) 2020 - 2022 Max Hohenegger <mellifluent@hohenegger.eu>
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,13 @@ import spoon.reflect.declaration.CtType;
 
 public interface IBuildMethodBuilder {
 
-    default CtMethod<?> build() {
-        CtMethod<?> buildMethod = Util.findDefaultMethods(getBuildable()).iterator().next().clone();
-        buildMethod.setDefaultMethod(false);
-        buildMethod.addModifier(PUBLIC);
-        buildMethod.setSimpleName("build");
-        return buildMethod;
-    }
+  default CtMethod<?> build() {
+    CtMethod<?> buildMethod = Util.findDefaultMethods(getBuildable()).iterator().next().clone();
+    buildMethod.setDefaultMethod(false);
+    buildMethod.addModifier(PUBLIC);
+    buildMethod.setSimpleName("build");
+    return buildMethod;
+  }
 
-    CtType<?> getBuildable();
+  CtType<?> getBuildable();
 }

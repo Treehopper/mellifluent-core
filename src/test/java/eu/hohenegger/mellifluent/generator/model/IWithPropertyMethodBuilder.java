@@ -2,7 +2,7 @@
  * #%L
  * mellifluent-core
  * %%
- * Copyright (C) 2020 - 2021 Max Hohenegger <mellifluent@hohenegger.eu>
+ * Copyright (C) 2020 - 2022 Max Hohenegger <mellifluent@hohenegger.eu>
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,53 +37,56 @@ import spoon.reflect.reference.CtTypeReference;
 
 public interface IWithPropertyMethodBuilder {
 
-    default CtMethod<Object> build() {
-        CtMethod<Object> withPropertyMethod = getTypeFactory().createMethod();
-        withPropertyMethod.addModifier(PUBLIC);
-        withPropertyMethod.setSimpleName("with" + Util.capitalizeFirstLetter(getPropertyField().getSimpleName()));
-        CtParameter<Object> withParameter = getTypeFactory().createParameter();
-        withParameter.setSimpleName(getPropertyField().getSimpleName());
-        CtTypeReference<Object> withParameterRef = getTypeFactory().createTypeReference();
-        withParameterRef.setSimpleName(getPropertyField().getType().getSimpleName()); //TODO: why cant we use the type directly?
-        withParameter.setType(withParameterRef);
-        withPropertyMethod.addParameter(withParameter);
-        withPropertyMethod.setType(getBuilder().getReference());
+  default CtMethod<Object> build() {
+    CtMethod<Object> withPropertyMethod = getTypeFactory().createMethod();
+    withPropertyMethod.addModifier(PUBLIC);
+    withPropertyMethod.setSimpleName(
+        "with" + Util.capitalizeFirstLetter(getPropertyField().getSimpleName()));
+    CtParameter<Object> withParameter = getTypeFactory().createParameter();
+    withParameter.setSimpleName(getPropertyField().getSimpleName());
+    CtTypeReference<Object> withParameterRef = getTypeFactory().createTypeReference();
+    withParameterRef.setSimpleName(
+        getPropertyField().getType().getSimpleName()); // TODO: why cant we use the type directly?
+    withParameter.setType(withParameterRef);
+    withPropertyMethod.addParameter(withParameter);
+    withPropertyMethod.setType(getBuilder().getReference());
 
-        CtAssignment<Object,Object> ctAssignment = getTypeFactory().createAssignment();
-        CtVariableRead<Object> parameterRead = getTypeFactory().createVariableRead();
-        CtLocalVariableReference<Object> parameterReference = getTypeFactory().createLocalVariableReference();
-        parameterReference.setSimpleName(getPropertyName());
-        parameterRead.setVariable(parameterReference);
-        ctAssignment.setAssigned(getFieldWrite());
-        ctAssignment.setAssignment(parameterRead);
-        CtBlock<Object> block = getTypeFactory().createBlock();
-        block.addStatement(ctAssignment);
+    CtAssignment<Object, Object> ctAssignment = getTypeFactory().createAssignment();
+    CtVariableRead<Object> parameterRead = getTypeFactory().createVariableRead();
+    CtLocalVariableReference<Object> parameterReference =
+        getTypeFactory().createLocalVariableReference();
+    parameterReference.setSimpleName(getPropertyName());
+    parameterRead.setVariable(parameterReference);
+    ctAssignment.setAssigned(getFieldWrite());
+    ctAssignment.setAssignment(parameterRead);
+    CtBlock<Object> block = getTypeFactory().createBlock();
+    block.addStatement(ctAssignment);
 
+    // self-call ===============================
+    CtInvocation<Object> selfInvocation = getTypeFactory().createInvocation();
+    CtMethod<Object> selfMethod =
+        (CtMethod<Object>) getAbstractBuilder().getMethodsByName("self").get(0);
+    selfMethod.setSimpleName("self");
+    selfInvocation.setExecutable(selfMethod.getReference());
+    CtReturn<Object> withMethodReturn = getTypeFactory().createReturn();
+    withMethodReturn.setReturnedExpression(selfInvocation);
+    block.addStatement(withMethodReturn);
+    // ===============================
 
-        // self-call ===============================
-        CtInvocation<Object> selfInvocation = getTypeFactory().createInvocation();
-        CtMethod<Object> selfMethod = (CtMethod<Object>) getAbstractBuilder().getMethodsByName("self").get(0);
-        selfMethod.setSimpleName("self");
-        selfInvocation.setExecutable(selfMethod.getReference());
-        CtReturn<Object> withMethodReturn = getTypeFactory().createReturn();
-        withMethodReturn.setReturnedExpression(selfInvocation);
-        block.addStatement(withMethodReturn);
-        //===============================
+    withPropertyMethod.setBody(block);
 
-        withPropertyMethod.setBody(block);
+    return withPropertyMethod;
+  }
 
-        return withPropertyMethod;
-    }
+  CtType<?> getAbstractBuilder();
 
-    CtType<?> getAbstractBuilder();
+  CtType<Object> getBuilder();
 
-    CtType<Object> getBuilder();
+  CtVariableAccess<Object> getFieldWrite();
 
-    CtVariableAccess<Object> getFieldWrite();
+  String getPropertyName();
 
-    String getPropertyName();
+  CtField<Object> getPropertyField();
 
-    CtField<Object> getPropertyField();
-
-    Factory getTypeFactory();
+  Factory getTypeFactory();
 }
