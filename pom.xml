@@ -154,24 +154,6 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>com.github.spotbugs</groupId>
-        <artifactId>spotbugs-maven-plugin</artifactId>
-        <version>4.2.3</version>
-        <configuration>
-          <fork>false</fork>
-          <failOnError>true</failOnError>
-          <excludeFilterFile>spotbugs-ignore.xml</excludeFilterFile>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>check</goal>
-            </goals>
-            <phase>verify</phase>
-          </execution>
-        </executions>
-      </plugin>
 
       <plugin>
         <groupId>com.diffplug.spotless</groupId>
