@@ -1,7 +1,2 @@
 tasks:
   - init: mvn compile generate-sources
-
-vscode:
-  extensions:
-    - vscjava.vscode-java-pack@0.18.4
-    - redhat.vscode-xml
