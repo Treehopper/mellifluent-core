@@ -37,7 +37,7 @@ import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtType;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@DisplayName("Generated Assisted Spoon Model Test")
+@DisplayName("Generated Spoon Model Test")
 public class GeneratedSpoonModelTest extends AbstractGeneratedSpoonModelTest {
 
   @BeforeAll
@@ -48,7 +48,7 @@ public class GeneratedSpoonModelTest extends AbstractGeneratedSpoonModelTest {
     generator = new FluentBuilderGenerator<>();
 
     Path folder = srcPath.resolve(srcPackageFolderName);
-    generator.setup(folder, GeneratedSourceCompilationTest.class.getClassLoader(), null, null);
+    generator.setup(folder, getClass().getClassLoader(), null, null);
 
     sourcePackageName = srcPackageFolderName.replace('/', '.');
     generated = generator.generate(sourcePackageName);

@@ -37,7 +37,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import spoon.reflect.declaration.CtClass;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class GeneratedUnassistedAutoImportTest {
+public class GeneratedAutoImportTest {
 
   public static final Path TARGET_PATH = Paths.get("target/generated-sources/java");
   public static final String TARGET_SUB_PATH = "foo";
@@ -57,7 +57,7 @@ public class GeneratedUnassistedAutoImportTest {
     sourcePackageName = FileReferenceClass.class.getPackageName();
     targetPackageName = TARGET_PACKAGE_FOLDER_NAME.replace('/', '.');
 
-    generator = new UnassistedFluentBuilderGenerator<>();
+    generator = new FluentBuilderGenerator<>();
     generator.setup(folder, getClass().getClassLoader(), null, null);
   }
 

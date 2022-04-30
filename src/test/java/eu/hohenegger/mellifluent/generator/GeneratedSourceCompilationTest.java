@@ -19,25 +19,23 @@
  */
 package eu.hohenegger.mellifluent.generator;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.TestInstance;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@DisplayName("Generated Assisted Source Compilation Test")
+@DisplayName("Generated Fluent Source Compilation Test")
 public class GeneratedSourceCompilationTest extends AbstractSourceCompilationTest {
 
   @BeforeAll
   protected void setUpAll() {
-    generator = new FluentBuilderGenerator<>();
-
-    String SRC_PACKAGE_FOLDER_NAME = "eu/hohenegger/mellifluent/generator/model";
+    String SRC_PACKAGE_FOLDER_NAME = "eu/hohenegger/mellifluent/generator/model/generics";
+    folder = Paths.get("src/test/java").resolve(SRC_PACKAGE_FOLDER_NAME);
     sourcePackageName = SRC_PACKAGE_FOLDER_NAME.replace('/', '.');
     targetPackageName = TARGET_PACKAGE_FOLDER_NAME.replace('/', '.');
 
-    Path folder = Paths.get("src/test/java").resolve(SRC_PACKAGE_FOLDER_NAME);
+    generator = new FluentBuilderGenerator<>();
     generator.setup(folder, getClass().getClassLoader(), null, null);
   }
 }

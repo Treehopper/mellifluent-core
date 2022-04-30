@@ -41,22 +41,21 @@ import spoon.reflect.declaration.CtType;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DisplayName("Verify that unassisted builders are generated correctly")
-public class GeneratedUnassistedBuilderSpoonModelTest {
+public class GeneratedBuilderSpoonModelTest {
 
   private static final String SRC_PACKAGE_FOLDER_NAME = "eu/hohenegger/mellifluent/generator";
   private static final Path SRC_PATH = Paths.get("src/test/java");
 
-  private static UnassistedFluentBuilderGenerator generator;
+  private static FluentBuilderGenerator generator;
   private static List<CtType<Object>> generated;
   private static String sourcePackageName;
 
   @BeforeAll
   public static void setUp() {
-    generator = new UnassistedFluentBuilderGenerator();
+    generator = new FluentBuilderGenerator();
 
     Path folder = SRC_PATH.resolve(SRC_PACKAGE_FOLDER_NAME);
-    generator.setup(
-        folder, GeneratedUnassistedBuilderSpoonModelTest.class.getClassLoader(), null, null);
+    generator.setup(folder, GeneratedBuilderSpoonModelTest.class.getClassLoader(), null, null);
 
     sourcePackageName = SRC_PACKAGE_FOLDER_NAME.replace('/', '.');
     generated = generator.generate(sourcePackageName);
