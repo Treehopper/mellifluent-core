@@ -23,7 +23,7 @@
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <mellifluent.spoon.version>1.4.0</mellifluent.spoon.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <spoon.version>7.6.0</spoon.version>
+    <spoon.version>10.2.0</spoon.version>
   </properties>
 
   <dependencies>
@@ -118,7 +118,7 @@
           <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
           <licenseName>apache_v2</licenseName>
           <organizationName>hohenegger.eu</organizationName>
-          <copyrightOwners>Max Hohenegger &lt;mellifluent@hohenegger.eu&gt;</copyrightOwners>
+          <copyrightOwners>Max Hohenegger &lt;mellifluent@hohenegger.eu></copyrightOwners>
           <inceptionYear>2021</inceptionYear>
         </configuration>
         <executions>
@@ -166,8 +166,8 @@
               <include>src/main/java/**/*.java</include>
               <include>src/test/java/**/*.java</include>
             </includes>
-            <importOrder></importOrder>
-            <removeUnusedImports></removeUnusedImports>
+            <importOrder/>
+            <removeUnusedImports/>
             <googleJavaFormat>
               <version>1.8</version>
               <style>GOOGLE</style>
