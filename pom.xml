@@ -23,7 +23,7 @@
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <mellifluent.spoon.version>1.4.0</mellifluent.spoon.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <spoon.version>7.6.0</spoon.version>
+    <spoon.version>8.1.0</spoon.version>
   </properties>
 
   <dependencies>
@@ -166,8 +166,8 @@
               <include>src/main/java/**/*.java</include>
               <include>src/test/java/**/*.java</include>
             </includes>
-            <importOrder></importOrder>
-            <removeUnusedImports></removeUnusedImports>
+            <importOrder/>
+            <removeUnusedImports/>
             <googleJavaFormat>
               <version>1.8</version>
               <style>GOOGLE</style>
